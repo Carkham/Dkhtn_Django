@@ -1,0 +1,11 @@
+# PRECAUTION: avoid production dependencies that aren't in development
+
+-r base.txt
+
+gunicorn==20.1.0  # https://github.com/benoitc/gunicorn
+mysqlclient==2.1.0 # https://github.com/PyMySQL/mysqlclient
+hiredis==2.0.0  # https://github.com/redis/hiredis-py
+
+# Django
+# ------------------------------------------------------------------------------
+django-anymail[mailgun]==8.6  # https://github.com/anymail/django-anymail
