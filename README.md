@@ -9,6 +9,26 @@ BUAA-SE-2023-dkhtn's django repo
 
     $ pip install -r requirements/local.txt
 
+## Project Structure
+
+```
+dkhtn_django
+│   README.md    
+│   ...
+└───dkhtn_django (apps)
+│   │   logs (日志模块)
+│   └───users (用户模块)
+│       │   tests (单元测试)
+│       │   urls.py
+│       │   views.py
+│       │   ...
+│   
+└───configs
+    │   urls.py
+    │   wsgi.py
+    └───settings (配置文件)
+```
+
 ## Settings
 
 Moved to [settings](http://cookiecutter-django.readthedocs.io/en/latest/settings.html).
