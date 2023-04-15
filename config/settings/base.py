@@ -77,6 +77,7 @@ DJANGO_APPS = [
     "django.forms",
     "corsheaders",
     "user",
+    "dkhtn_django.log"
 ]
 THIRD_PARTY_APPS = [
     "crispy_forms",
