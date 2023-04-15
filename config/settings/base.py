@@ -52,7 +52,7 @@ DATABASES = {
     #     'USER': 'root',  # mysql的用户名
     #     'PASSWORD': 'xian'  # mysql的密码
     # }
-    "default": env.db("DATABASE_URL", default="mysql://root:xian@81.70.201.11:3306/dkhtn_mysql"),
+    "default": env.db("DATABASE_URL", default="mysql://root:buaase2023@139.9.143.161:3306/faas_project_data"),
 }
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
 # https://docs.djangoproject.com/en/stable/ref/settings/#std:setting-DEFAULT_AUTO_FIELD
