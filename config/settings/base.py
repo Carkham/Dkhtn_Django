@@ -1,6 +1,8 @@
 """
 Base settings to build other settings files upon.
 """
+import os
+import sys
 from pathlib import Path
 
 import environ
@@ -76,8 +78,6 @@ DJANGO_APPS = [
     "django.contrib.admin",
     "django.forms",
     "corsheaders",
-    "user",
-    "dkhtn_django.log"
 ]
 THIRD_PARTY_APPS = [
     "crispy_forms",
@@ -89,9 +89,12 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     # Your stuff: custom apps go here
+    "dkhtn_django.user",
+    "dkhtn_django.log"
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+sys.path.insert(0,os.path.join(ROOT_DIR,'dkhtn_django'))
 
 # MIGRATIONS
 # ------------------------------------------------------------------------------
