@@ -7,5 +7,5 @@ class RabbitMQ:
         channel = connection.channel()
 
         channel.queue_declare(queue="email_send_queue")
-        channel.basic_publish(exchange="",routing_key="email_send_queue",body=email)
+        channel.basic_publish(exchange="", routing_key="email_send_queue", body=email)
         channel.close()

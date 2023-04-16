@@ -1,6 +1,5 @@
 # from django.contrib.auth.models import User
 from django.http import JsonResponse
-
 from .rabbit.RabbitMQ import RabbitMQ
 
 
@@ -16,4 +15,3 @@ def email_send(request):
 
 def email_check(request):
     pass
-
