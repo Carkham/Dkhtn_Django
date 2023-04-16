@@ -4,7 +4,6 @@ import smtplib
 from email.mime.text import MIMEText
 
 import pika
-from django.template import loader
 
 from config.settings.base import EMAIL_FROM, EMAIL_TITLE, EMAIL_HOST, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD
 from config.settings.base import rabbitmq_host
