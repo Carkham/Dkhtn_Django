@@ -11,8 +11,28 @@ def client():
 
 
 @pytest.mark.django_db
-def test_email_send(client):
-    response = client.get('/api/user/email-send?email=test@test.com')
-    assert response.status_code == 200
-    assert response.json()["code"] == 0
-    assert response.json()["message"] == "验证码发送成功"
+@pytest.mark.parametrize(
+    "get_url, status_code, info_dict",
+    [
+        (
+            "/api/user/email-send?email=test@test.com",
+            200,
+            {
+                "code": 0,
+                "message": "验证码发送成功"
+            }
+        ),
+        (
+            "/api/user/email-send",
+            200,
+            {
+                "code": 1,
+                "message": "请输入邮箱"
+            }
+        ),
+    ]
+)
+def test_email_send(client, get_url, status_code, info_dict):
+    response = client.get(get_url)
+    assert response.status_code == status_code
+    assert response.json() == info_dict

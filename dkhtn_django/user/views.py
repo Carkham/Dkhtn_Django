@@ -1,22 +1,23 @@
 # from django.contrib.auth.models import User
 from django.http import JsonResponse
-from .rabbit.RabbitMQ import RabbitMQ
-from .rabbit.EmailSender import send_email
-from django.conf import settings
+from .rabbit.RabbitMQ import rabbit_mq
 
 
 def email_send(request):
     email = request.GET.get('email')
-    # FIXME: 我靠要是没有'email'字段怎么办
-    if settings.DEBUG:
-        send_email(email)
+    if email is None:
+        ret = {
+            "code": 1,
+            "message": "请输入邮箱"
+        }
+        return JsonResponse(ret)
     else:
-        RabbitMQ(email)
-    ret = {
-        "code": 0,
-        "message": "验证码发送成功",
-    }
-    return JsonResponse(ret)
+        rabbit_mq(email)
+        ret = {
+            "code": 0,
+            "message": "验证码发送成功",
+        }
+        return JsonResponse(ret)
 
 
 def email_check(request):
