@@ -25,9 +25,9 @@ DEBUG = env.bool("DJANGO_DEBUG", False)
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # though not all of them may be available with every OS.
 # In Windows, this must be set to your system time zone.
-TIME_ZONE = "Asia/Harbin"
+TIME_ZONE = "Asia/Shanghai"
 # https://docs.djangoproject.com/en/dev/ref/settings/#language-code
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "zh-hans"
 # https://docs.djangoproject.com/en/dev/ref/settings/#site-id
 SITE_ID = 1
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-i18n
@@ -44,14 +44,6 @@ LOCALE_PATHS = [str(ROOT_DIR / "locale")]
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.mysql',  # 默认
-    #     'NAME': 'dkhtn_mysql',  # 连接的数据库
-    #     'HOST': '81.70.201.11',  # mysql的ip地址
-    #     'PORT': 3306,  # mysql的端口
-    #     'USER': 'root',  # mysql的用户名
-    #     'PASSWORD': 'xian'  # mysql的密码
-    # }
     "default": env.db("DATABASE_URL", default="mysql://root:buaase2023@139.9.143.161:3306/faas_project_data"),
 }
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
@@ -224,12 +216,17 @@ X_FRAME_OPTIONS = "DENY"
 # EMAIL
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
-EMAIL_BACKEND = env(
-    "DJANGO_EMAIL_BACKEND",
-    default="django.core.mail.backends.smtp.EmailBackend",
+EMAIL_BACKEND = (
+    "django.core.mail.backends.smtp.EmailBackend",
 )
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-timeout
-EMAIL_TIMEOUT = 5
+EMAIL_HOST = "smtp.163.com"
+EMAIL_PORT = 587
+EMAIL_HOST_USER = "dkhtn163@163.com"
+EMAIL_HOST_PASSWORD = "AIAEFEMEZZGENSXO"
+EMAIL_USE_TLS = False
+EMAIL_TITLE = "Faas 邮箱验证"
+EMAIL_FROM = EMAIL_HOST_USER
 
 # ADMIN
 # ------------------------------------------------------------------------------
