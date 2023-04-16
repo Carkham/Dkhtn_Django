@@ -1,9 +1,10 @@
 import multiprocessing as mp
 import random
 import smtplib
-from email.mime.text import MIMEText
 import pika
+from email.mime.text import MIMEText
 from config.settings.base import EMAIL_FROM, EMAIL_TITLE, EMAIL_HOST, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD
+from config.settings.base import rabbitmq_host
 
 
 class EmailSender(mp.Process):
@@ -40,7 +41,7 @@ def callback(ch, method, properties, email):
 
 
 def connect_rabbitmq():
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='139.9.143.161'))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(rabbitmq_host))
     channel = connection.channel()
     channel.queue_declare(queue='email_send_queue')
 

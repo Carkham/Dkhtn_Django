@@ -1,9 +1,10 @@
 import pika
+from config.settings.base import rabbitmq_host
 
 
 class RabbitMQ:
     def __init__(self, email):
-        connection = pika.BlockingConnection(pika.ConnectionParameters('139.9.143.161'))
+        connection = pika.BlockingConnection(pika.ConnectionParameters(rabbitmq_host))
         channel = connection.channel()
 
         channel.queue_declare(queue="email_send_queue")

@@ -228,6 +228,8 @@ EMAIL_USE_TLS = False
 EMAIL_TITLE = "Faas 邮箱验证"
 EMAIL_FROM = EMAIL_HOST_USER
 
+rabbitmq_host = '139.9.143.161'
+
 # ADMIN
 # ------------------------------------------------------------------------------
 # Django Admin URL.
