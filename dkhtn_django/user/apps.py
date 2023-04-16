@@ -1,4 +1,5 @@
 from django.apps import AppConfig
+from django.conf import settings
 
 
 class UserConfig(AppConfig):
@@ -7,4 +8,5 @@ class UserConfig(AppConfig):
 
     def ready(self):
         from .rabbit.EmailSender import start_email_sender
-        start_email_sender()
+        if not settings.DEBUG:
+            start_email_sender()

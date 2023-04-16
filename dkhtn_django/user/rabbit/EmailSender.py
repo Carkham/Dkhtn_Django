@@ -158,36 +158,24 @@ html_end = """</button>
 """
 
 
-class EmailSender(mp.Process):
-    def __init__(self, name):
-        self.name = name
-        super().__init__()
-
-    def run(self):
-        start_email_sender()
-
-
-def callback(ch, method, properties, email):
-    sender = 'dkhtn163@163.com'
-    receivers = [email.decode('utf-8')]
-
+def send_email(email):
     sms_code = '%06d' % random.randint(0, 999999)
     context = html_head + sms_code + html_end
     message = MIMEText(context, 'html', 'utf-8')
     message['Subject'] = EMAIL_TITLE
     message['From'] = EMAIL_FROM
-    message['To'] = receivers[0]
+    message['To'] = email
 
-    try:
-        smtpObj = smtplib.SMTP()
-        smtpObj.connect(EMAIL_HOST, 25)
-        smtpObj.login(EMAIL_HOST_USER, EMAIL_HOST_PASSWORD)
-        smtpObj.sendmail(sender, receivers, message.as_string())
-        smtpObj.quit()
-    except smtplib.SMTPException as e:
-        print('error', e)
+    smtpObj = smtplib.SMTP()
+    smtpObj.connect(EMAIL_HOST, 25)
+    smtpObj.login(EMAIL_HOST_USER, EMAIL_HOST_PASSWORD)
+    smtpObj.sendmail(EMAIL_FROM, [email], message.as_string())
+    smtpObj.quit()
+    print("邮箱：{0} 发送成功".format(email))
 
-    print("邮箱：{0} 发送成功".format(email.decode("utf-8")))
+
+def callback(ch, method, properties, email):
+    send_email(email.decode("utf-8"))
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
 
@@ -206,4 +194,3 @@ def connect_rabbitmq():
 def start_email_sender():
     sender = mp.Process(target=connect_rabbitmq)
     sender.start()
-

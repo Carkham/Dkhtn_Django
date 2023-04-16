@@ -5,6 +5,6 @@ urlpatterns = [
     # user urls
 
     # email
-    path("email-send", user_views.email_send),
+    path("email-send", user_views.email_send, name="email-send"),
     path("email-check", user_views.email_check),
 ]
