@@ -16,4 +16,3 @@ def test_email_send(client):
     assert response.status_code == 200
     assert response.json()["code"] == 0
     assert response.json()["message"] == "验证码发送成功"
-
