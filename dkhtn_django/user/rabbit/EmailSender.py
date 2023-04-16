@@ -1,9 +1,9 @@
-import multiprocessing as mp
 import random
 import smtplib
 from email.mime.text import MIMEText
 
 import pika
+import threading
 
 from config.settings.base import EMAIL_FROM, EMAIL_TITLE, EMAIL_HOST, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD
 from config.settings.base import rabbitmq_host
@@ -172,23 +172,26 @@ def send_email(email):
     smtpObj.quit()
 
 
-def callback(ch, method, properties, email):
-    send_email(email.decode("utf-8"))
-    ch.basic_ack(delivery_tag=method.delivery_tag)
+class AMQPConsuming(threading.Thread):
+    def callback(self, ch, method, properties, email):
+        # do something
+        send_email(email.decode("utf-8"))
+        ch.basic_ack(delivery_tag=method.delivery_tag)
 
+    @staticmethod
+    def _get_connection():
+        parameters = pika.ConnectionParameters(rabbitmq_host)
+        return pika.BlockingConnection(parameters)
 
-def connect_rabbitmq():
-    connection = pika.BlockingConnection(pika.ConnectionParameters(rabbitmq_host))
-    channel = connection.channel()
-    channel.queue_declare(queue='email_send_queue')
+    def run(self):
+        connection = self._get_connection()
+        channel = connection.channel()
 
-    channel.basic_consume(queue='email_send_queue',
-                          auto_ack=False,
-                          on_message_callback=callback)
-    # 开始监听队列
-    channel.start_consuming()
+        channel.queue_declare(queue='email_send_queue')
 
+        print('Hello world! :)')
 
-def start_email_sender():
-    sender = mp.Process(target=connect_rabbitmq)
-    sender.start()
+        channel.basic_qos(prefetch_count=1)
+        channel.basic_consume(queue='email_send_queue', on_message_callback=self.callback)
+
+        channel.start_consuming()

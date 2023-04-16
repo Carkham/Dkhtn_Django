@@ -1,5 +1,5 @@
 from django.apps import AppConfig
-from django.conf import settings
+from .rabbit.EmailSender import AMQPConsuming
 
 
 class UserConfig(AppConfig):
@@ -7,6 +7,6 @@ class UserConfig(AppConfig):
     name = 'user'
 
     def ready(self):
-        from .rabbit.EmailSender import start_email_sender
-        if not settings.DEBUG:
-            start_email_sender()
+        consumer = AMQPConsuming()
+        consumer.daemon = True
+        consumer.start()
