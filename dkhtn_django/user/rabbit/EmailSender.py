@@ -170,7 +170,6 @@ def send_email(email):
     smtpObj.login(EMAIL_HOST_USER, EMAIL_HOST_PASSWORD)
     smtpObj.sendmail(EMAIL_FROM, [email], message.as_string())
     smtpObj.quit()
-    print("邮箱：{0} 发送成功".format(email))
 
 
 def callback(ch, method, properties, email):
