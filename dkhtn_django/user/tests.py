@@ -39,8 +39,6 @@ def test_email_send(client, get_url, status_code, info_dict):
     assert response.json() == info_dict
 
 
-
-
 @pytest.mark.django_db
 @pytest.mark.parametrize(
     "get_url, status_code, info_dict",

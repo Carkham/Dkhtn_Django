@@ -19,21 +19,21 @@ ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1"]
 CACHES = {
     'default': {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://139.9.143.161:6379/0",
+        "LOCATION": os.getenv("REDIS_DEFAULT_LOCATION"),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "IGNORE_EXCEPTIONS": True,
-            "PASSWORD": "123445678",
+            "PASSWORD": os.getenv("REDIS_DEFAULT_PASSWORD"),
             # "SERIALIZER": "django_redis.serializers.json.JSONSerializer"
         },
     },
     '1': {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://139.9.143.161:6379/1",
+        "LOCATION": os.getenv("REDIS_1_LOCATION"),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "IGNORE_EXCEPTIONS": True,
-            "PASSWORD": "123445678",
+            "PASSWORD": os.getenv("REDIS_1_PASSWORD"),
             # "SERIALIZER": "django_redis.serializers.json.JSONSerializer"
         },
     }
