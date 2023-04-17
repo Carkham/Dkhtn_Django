@@ -30,6 +30,6 @@ def rsa_get(request):
     response = {
         "code": 0,
         "message": "success",
-        "data": "rsa-pub {}".format(str(settings.RSA_PUBLIC_KEY))
+        "data": settings.RSA_PUBLIC_KEY,
     }
     return JsonResponse(response)
