@@ -3,6 +3,7 @@
 # Create your tests here.
 import pytest
 from django.test import Client
+from django.conf import settings
 
 
 @pytest.fixture()
@@ -33,6 +34,27 @@ def client():
     ]
 )
 def test_email_send(client, get_url, status_code, info_dict):
+    response = client.get(get_url)
+    assert response.status_code == status_code
+    assert response.json() == info_dict
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "get_url, status_code, info_dict",
+    [
+        (
+            "/api/user/rsa-pub",
+            200,
+            {
+                "code": 0,
+                "message": "success",
+                "data": settings.RSA_PUBLIC_KEY,
+            }
+        ),
+    ]
+)
+def test_ras_get(client, get_url, status_code, info_dict):
     response = client.get(get_url)
     assert response.status_code == status_code
     assert response.json() == info_dict

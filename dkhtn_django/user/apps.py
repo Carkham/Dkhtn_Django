@@ -4,7 +4,7 @@ from .rabbit.EmailSender import AMQPConsuming
 
 class UserConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'user'
+    name = 'dkhtn_django.user'
 
     def ready(self):
         consumer = AMQPConsuming()
