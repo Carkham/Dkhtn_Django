@@ -52,7 +52,7 @@ def login(request):
     :return: JsonResponse
     """
     try:
-        _request = JsonReq(request.body)
+        _request = JsonReq(request)
         username = _request.POST.get('uname')
         password = _request.POST.get('password')
         user = auth.authenticate(username=username, password=password)

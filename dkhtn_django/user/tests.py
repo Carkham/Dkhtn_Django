@@ -84,7 +84,7 @@ def test_rsa_get(client, url, status_code, info_dict):
             200,
             {
                 "code": 1,
-                "message": "用户名或密码错误",
+                "message": "用户名或邮箱号或密码错误",
             }
         ),
     ]
