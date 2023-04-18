@@ -34,6 +34,10 @@ jobs:
     env:
       # mysql://user:password@host:port/database
       DATABASE_URL: mysql://root:buaase2023@139.9.143.161:3306/faas_project_data
+      REDIS_DEFAULT_LOCATION: {{ $secrets.REDIS_DEFAULT_LOCATION }}
+      REDIS_DEFAULT_PASSWORD: {{ $secrets.REDIS_DEFAULT_PASSWORD }}
+      REDIS_1_LOCATION: {{ $secrets.REDIS_1_LOCATION }}
+      REDIS_1_PASSWORD: {{ $secrets.REDIS_1_PASSWORD }}
 
     steps:
 
