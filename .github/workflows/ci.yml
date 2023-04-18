@@ -56,6 +56,8 @@ jobs:
 
       - name: Test with pytest
         run:  pytest
+        with:
+          database_url: ${{ secrets.DATABASE_URL }}
 
       - name: Generate Report
         run: |
