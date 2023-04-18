@@ -4,6 +4,7 @@ import dkhtn_django.user.views as user_views
 urlpatterns = [
     # user urls
     path("rsa-pub", user_views.rsa_get),
+    path("login", user_views.login),
 
     # email
     path("email-send", user_views.email_send),
