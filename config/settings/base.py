@@ -86,7 +86,7 @@ LOCAL_APPS = [
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
-sys.path.insert(0,os.path.join(ROOT_DIR,'dkhtn_django'))
+sys.path.insert(0, os.path.join(ROOT_DIR, 'dkhtn_django'))
 
 # MIGRATIONS
 # ------------------------------------------------------------------------------
@@ -320,3 +320,13 @@ bHZpKP0rqzqlz1Z62LHZh6eTyjFtKOw+qRSYE4nUlt7k0glBk3M4VqBsLdjxAm5c
 chzN7EngUZj/ddKZs0Wmsm7O5KVePIRcHS3B3zfJT+g9v6OEDJafSn23JbK8yTGV
 ooCEG6gQIkg16Hz5HwIDAQAB
 -----END PUBLIC KEY-----'''
+
+# redis缓存默认失效时间
+REDIS_TIMEOUT = 60 * 60 * 24 * 7
+# session id 字段命名
+REDIS_SESSION_NAME = "session_id"
+# 登录信息所在redis
+REDIS_DB_LOGIN = 'default'
+# 邮箱验证所在redis
+REDIS_DB_VERIFY = '1'
+
