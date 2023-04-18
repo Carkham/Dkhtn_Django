@@ -54,6 +54,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements/local.txt
 
+      - run: echo 'Hi ${{ env.DATABASE_URL }}'
+
+      - run: echo 'Hi ${{ env.DATABASE_URL }}'
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
       - name: Test with pytest
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
