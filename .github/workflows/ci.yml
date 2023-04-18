@@ -55,9 +55,9 @@ jobs:
           pip install -r requirements/local.txt
 
       - name: Test with pytest
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run:  pytest
-        with:
-          database_url: ${{ secrets.DATABASE_URL }}
 
       - name: Generate Report
         run: |
