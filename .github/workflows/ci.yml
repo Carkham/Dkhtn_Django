@@ -33,7 +33,7 @@ jobs:
 
     env:
       # mysql://user:password@host:port/database
-      DATABASE_URL: "mysql://root:xian@81.70.201.11:3306/dkhtn_mysql"
+      DATABASE_URL: mysql://root:buaase2023@139.9.143.161:3306/faas_project_data
 
     steps:
 
@@ -56,3 +56,13 @@ jobs:
 
       - name: Test with pytest
         run:  pytest
+
+      - name: Generate Report
+        run: |
+          pip install coverage
+          coverage run -m pytest
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

@@ -17,9 +17,25 @@ ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1"]
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#caches
 CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
-        "LOCATION": "",
+    'default': {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": os.getenv("REDIS_DEFAULT_LOCATION"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "IGNORE_EXCEPTIONS": True,
+            "PASSWORD": os.getenv("REDIS_DEFAULT_PASSWORD"),
+            # "SERIALIZER": "django_redis.serializers.json.JSONSerializer"
+        },
+    },
+    '1': {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": os.getenv("REDIS_1_LOCATION"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "IGNORE_EXCEPTIONS": True,
+            "PASSWORD": os.getenv("REDIS_1_PASSWORD"),
+            # "SERIALIZER": "django_redis.serializers.json.JSONSerializer"
+        },
     }
 }
 

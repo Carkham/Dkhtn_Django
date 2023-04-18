@@ -2,11 +2,14 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 from django.views import defaults as default_views
+import dkhtn_django.user.urls as user_urls
 
 urlpatterns = [
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
+
     # Your stuff: custom urls includes go here
+    path("api/user/", include(user_urls)),
 ]
 
 

@@ -1,6 +1,8 @@
 """
 Base settings to build other settings files upon.
 """
+import os
+import sys
 from pathlib import Path
 
 import environ
@@ -23,9 +25,9 @@ DEBUG = env.bool("DJANGO_DEBUG", False)
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # though not all of them may be available with every OS.
 # In Windows, this must be set to your system time zone.
-TIME_ZONE = "Asia/Harbin"
+TIME_ZONE = "Asia/Shanghai"
 # https://docs.djangoproject.com/en/dev/ref/settings/#language-code
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "zh-hans"
 # https://docs.djangoproject.com/en/dev/ref/settings/#site-id
 SITE_ID = 1
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-i18n
@@ -42,15 +44,7 @@ LOCALE_PATHS = [str(ROOT_DIR / "locale")]
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.mysql',  # 默认
-    #     'NAME': 'dkhtn_mysql',  # 连接的数据库
-    #     'HOST': '81.70.201.11',  # mysql的ip地址
-    #     'PORT': 3306,  # mysql的端口
-    #     'USER': 'root',  # mysql的用户名
-    #     'PASSWORD': 'xian'  # mysql的密码
-    # }
-    "default": env.db("DATABASE_URL", default="mysql://root:xian@81.70.201.11:3306/dkhtn_mysql"),
+    "default": env.db("DATABASE_URL", default="mysql://root:buaase2023@139.9.143.161:3306/faas_project_data"),
 }
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
 # https://docs.djangoproject.com/en/stable/ref/settings/#std:setting-DEFAULT_AUTO_FIELD
@@ -75,6 +69,7 @@ DJANGO_APPS = [
     # "django.contrib.humanize", # Handy template tags
     "django.contrib.admin",
     "django.forms",
+    "corsheaders",
 ]
 THIRD_PARTY_APPS = [
     "crispy_forms",
@@ -86,9 +81,12 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     # Your stuff: custom apps go here
+    "dkhtn_django.user",
+    "dkhtn_django.log"
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+sys.path.insert(0,os.path.join(ROOT_DIR,'dkhtn_django'))
 
 # MIGRATIONS
 # ------------------------------------------------------------------------------
@@ -103,12 +101,11 @@ AUTHENTICATION_BACKENDS = [
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model
-# FIXME: 增加user
-# AUTH_USER_MODEL = "users.User"
+AUTH_USER_MODEL = "user.User"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
 # LOGIN_REDIRECT_URL = "users:redirect"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-url
-# LOGIN_URL = "account_login"
+LOGIN_URL = "api/user/login"
 
 # PASSWORDS
 # ------------------------------------------------------------------------------
@@ -122,9 +119,7 @@ PASSWORD_HASHERS = [
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
-    },
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
@@ -134,12 +129,13 @@ AUTH_PASSWORD_VALIDATORS = [
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
+    # "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.common.BrokenLinkEmailsMiddleware",
@@ -211,7 +207,7 @@ FIXTURE_DIRS = (str(APPS_DIR / "fixtures"),)
 # https://docs.djangoproject.com/en/dev/ref/settings/#session-cookie-httponly
 SESSION_COOKIE_HTTPONLY = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#csrf-cookie-httponly
-CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = False
 # https://docs.djangoproject.com/en/dev/ref/settings/#secure-browser-xss-filter
 SECURE_BROWSER_XSS_FILTER = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#x-frame-options
@@ -220,12 +216,19 @@ X_FRAME_OPTIONS = "DENY"
 # EMAIL
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
-EMAIL_BACKEND = env(
-    "DJANGO_EMAIL_BACKEND",
-    default="django.core.mail.backends.smtp.EmailBackend",
+EMAIL_BACKEND = (
+    "django.core.mail.backends.smtp.EmailBackend",
 )
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-timeout
-EMAIL_TIMEOUT = 5
+EMAIL_HOST = "smtp.163.com"
+EMAIL_PORT = 587
+EMAIL_HOST_USER = "dkhtn163@163.com"
+EMAIL_HOST_PASSWORD = "AIAEFEMEZZGENSXO"
+EMAIL_USE_TLS = False
+EMAIL_TITLE = "Faas 邮箱验证"
+EMAIL_FROM = EMAIL_HOST_USER
+
+rabbitmq_host = '139.9.143.161'
 
 # ADMIN
 # ------------------------------------------------------------------------------
@@ -281,3 +284,39 @@ LOGGING = {
 
 # Your stuff...
 # ------------------------------------------------------------------------------
+
+# cors
+CORS_ALLOW_CREDENTIALS = True  # 后端是否支持对cookie的操作。
+CORS_ORIGIN_ALLOW_ALL = True  # 允许请求来源
+CORS_REPLACE_HTTPS_REFERER = False  # 配置请求通过django csrf验证
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+    'VIEW',
+]
+
+CORS_ALLOW_HEADERS = [
+    'XMLHttpRequest',
+    'X_FILENAME',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'Pragma',
+]
+
+# RSA公钥
+RSA_PUBLIC_KEY = '''-----BEGIN PUBLIC KEY-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCzajFWnkVU8zhcElaooCEEMZMS
+bHZpKP0rqzqlz1Z62LHZh6eTyjFtKOw+qRSYE4nUlt7k0glBk3M4VqBsLdjxAm5c
+chzN7EngUZj/ddKZs0Wmsm7O5KVePIRcHS3B3zfJT+g9v6OEDJafSn23JbK8yTGV
+ooCEG6gQIkg16Hz5HwIDAQAB
+-----END PUBLIC KEY-----'''

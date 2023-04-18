@@ -375,3 +375,5 @@ tags
 
 ### Project template
 dkhtn_django/media/
+.idea
+venvx
