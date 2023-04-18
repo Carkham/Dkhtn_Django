@@ -3,7 +3,7 @@ import json
 
 class GetParser:
     """
-    GET请求格式解析
+    GET请求格式解析.
     """
     def __init__(self, request):
         self.request = request
@@ -14,7 +14,7 @@ class GetParser:
 
 class PostParser:
     """
-    POST请求格式解析
+    POST请求格式解析.
     """
     def __init__(self, body: bytes):
         self.obj = json.loads(body)
@@ -25,7 +25,7 @@ class PostParser:
 
 class JsonReq:
     """
-    request请求格式解析
+    Request请求格式解析.
     """
     def __init__(self, request):
         if request.method == 'POST':
