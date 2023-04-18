@@ -3,6 +3,9 @@ from . import models
 
 
 class UserBackend(ModelBackend):
+    """
+    令原authenticate支持邮箱+密码验证
+    """
     def authenticate(self, request, username=None, password=None, **kwargs):
         try:
             user = models.User.objects.get(username=username)

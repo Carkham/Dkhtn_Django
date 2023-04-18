@@ -1,8 +1,21 @@
 import json
 
 
-# POST请求格式解析
+class GetParser:
+    """
+    GET请求格式解析
+    """
+    def __init__(self, request):
+        self.request = request
+
+    def get(self, key):
+        return self.request.GET.get(key)
+
+
 class PostParser:
+    """
+    POST请求格式解析
+    """
     def __init__(self, body: bytes):
         self.obj = json.loads(body)
 
@@ -11,5 +24,11 @@ class PostParser:
 
 
 class JsonReq:
-    def __init__(self, body: bytes):
-        self.POST = PostParser(body)
+    """
+    request请求格式解析
+    """
+    def __init__(self, request):
+        if request.method == 'POST':
+            self.POST = PostParser(request.body)
+        elif request.method == 'GET':
+            self.GET = GetParser(request)

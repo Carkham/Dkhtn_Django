@@ -9,7 +9,8 @@ from .models import User
 
 
 def email_send(request):
-    email = request.GET.get('email')
+    _request = JsonReq(request)
+    email = _request.GET.get('email')
     if email is None:
         ret = {
             "code": 1,
@@ -29,8 +30,12 @@ def email_check(request):
     pass
 
 
-# 获取RSA公钥
 def rsa_get(request):
+    """
+    获取RSA公钥
+    :param request:
+    :return: RSA公钥
+    """
     response = {
         "code": 0,
         "message": "success",
@@ -39,9 +44,13 @@ def rsa_get(request):
     return JsonResponse(response)
 
 
-# 登录接口，暂时不允许多点登录，多点登录涉及同步问题
 @wrapper_set_login
 def login(request):
+    """
+    登录接口，暂时不允许多点登录，多点登录涉及同步问题
+    :param request:
+    :return: JsonResponse
+    """
     try:
         _request = JsonReq(request.body)
         username = _request.POST.get('uname')

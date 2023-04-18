@@ -12,8 +12,11 @@ class User(AbstractUser):
     email = models.CharField(max_length=32, unique=True, verbose_name='邮箱')
     avatar = models.CharField(max_length=4, verbose_name='头像')
 
-    # 对标获取用户信息接口+id，存入redis
     def userinfo(self):
+        """
+        对标获取用户信息接口+id，存入redis
+        :return: 用户信息
+        """
         return {
             'id': self.id,
             'username': self.username,

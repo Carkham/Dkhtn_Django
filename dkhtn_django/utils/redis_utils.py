@@ -8,12 +8,32 @@ redis_clis = {
 
 
 def redis_get(db_index, key):
+    """
+    读redis
+    :param db_index: redis库名称
+    :param key:
+    :return:
+    """
     return redis_clis[db_index].get(key)
 
 
 def redis_set(db_index, key, value, timeout=settings.REDIS_TIMEOUT):
+    """
+    写redis
+    :param db_index: redis库名称
+    :param key:
+    :param value:
+    :param timeout:
+    :return:
+    """
     redis_clis[db_index].set(key, value, timeout)
 
 
 def redis_delete(db_index, key):
+    """
+    删redis项
+    :param db_index: redis库名称
+    :param key:
+    :return:
+    """
     redis_clis[db_index].delete(key)
