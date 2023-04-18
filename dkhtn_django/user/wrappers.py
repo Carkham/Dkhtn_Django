@@ -9,7 +9,8 @@ from django.conf import settings
 def ret_code_check(ret):
     try:
         return json.loads(ret.content.decode('utf-8'))['code'] == 0
-    except:
+    except Exception as e:
+        e.__str__()
         return False
 
 
