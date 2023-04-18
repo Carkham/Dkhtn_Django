@@ -47,16 +47,16 @@ def login(request):
         username = _request.POST.get('uname')
         password = _request.POST.get('password')
         user = auth.authenticate(username=username, password=password)
-        # 登录信息登记
-        if isinstance(user, User):
-            request.userinfo = user.userinfo()
         if user is None:
             response = {
                 "code": 1,
-                "message": "用户名或密码错误",
+                "message": "用户名或邮箱号或密码错误",
             }
             return JsonResponse(response)
         else:
+            # 登录信息登记
+            if isinstance(user, User):
+                request.userinfo = user.userinfo()
             response = {
                 "code": 0,
                 "message": "登录成功",
