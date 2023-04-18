@@ -1,6 +1,5 @@
-# from django.test import TestCase
+import json
 
-# Create your tests here.
 import pytest
 from django.test import Client
 from django.conf import settings
@@ -13,7 +12,7 @@ def client():
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    "get_url, status_code, info_dict",
+    "url, status_code, info_dict",
     [
         (
             "/api/user/email-send?email=test@test.com",
@@ -33,15 +32,15 @@ def client():
         ),
     ]
 )
-def test_email_send(client, get_url, status_code, info_dict):
-    response = client.get(get_url)
+def test_email_send(client, url, status_code, info_dict):
+    response = client.get(url)
     assert response.status_code == status_code
     assert response.json() == info_dict
 
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    "get_url, status_code, info_dict",
+    "url, status_code, info_dict",
     [
         (
             "/api/user/rsa-pub",
@@ -54,7 +53,43 @@ def test_email_send(client, get_url, status_code, info_dict):
         ),
     ]
 )
-def test_ras_get(client, get_url, status_code, info_dict):
-    response = client.get(get_url)
+def test_rsa_get(client, url, status_code, info_dict):
+    response = client.get(url)
+    assert response.status_code == status_code
+    assert response.json() == info_dict
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "url, info, status_code, info_dict",
+    [
+        # (
+        #     "/api/user/login",
+        #     {
+        #         "uname": "用户名",
+        #         "password": "rsa加密的用户密码字符串"
+        #     },
+        #     200,
+        #     {
+        #         "code": 0,
+        #         "message": "登录成功",
+        #     }
+        # ),
+        (
+            "/api/user/login",
+            {
+                "uname": "test",
+                "password": "test"
+            },
+            200,
+            {
+                "code": 1,
+                "message": "用户名或邮箱号或密码错误",
+            }
+        ),
+    ]
+)
+def test_login(client, url, info, status_code, info_dict):
+    response = client.post(url, data=json.dumps(info), content_type='applications/json')
     assert response.status_code == status_code
     assert response.json() == info_dict
