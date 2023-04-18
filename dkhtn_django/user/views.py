@@ -1,13 +1,11 @@
-# from django.contrib.auth.models import User
-import json
-
-from django.http import JsonResponse
 from django.conf import settings
 from django.contrib import auth
+from django.http import JsonResponse
+
 from ..utils.json_req_parser import JsonReq
 from .rabbit.RabbitMQ import rabbit_mq
-from .models import User
 from .wrappers import wrapper_set_login
+from .models import User
 
 
 def email_send(request):
@@ -50,7 +48,8 @@ def login(request):
         password = _request.POST.get('password')
         user = auth.authenticate(username=username, password=password)
         # 登录信息登记
-        request.userinfo = user.userinfo()
+        if isinstance(user, User):
+            request.userinfo = user.userinfo()
         if user is None:
             response = {
                 "code": 1,
