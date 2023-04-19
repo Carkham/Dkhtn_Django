@@ -100,6 +100,9 @@ def test_rsa_get(client, url, status_code, info_dict):
     assert response.json() == info_dict
 
 
+login_session_id = None
+
+
 @pytest.mark.django_db
 @pytest.mark.parametrize(
     "url, info, status_code, info_dict",
@@ -143,6 +146,7 @@ def test_rsa_get(client, url, status_code, info_dict):
     ]
 )
 def test_login(client, url, info, status_code, info_dict):
+    global login_session_id
     username = "用户名"
     password = "rsa加密的用户密码字符串"
     avatar = "2"
@@ -151,6 +155,11 @@ def test_login(client, url, info, status_code, info_dict):
                                     password=password,
                                     avatar=avatar,
                                     email=email)
+    if login_session_id is not None:
+        client.cookies.__setitem__("session_id", login_session_id)
     response = client.post(url, data=json.dumps(info), content_type='applications/json')
+    login_session_id = response.cookies.get("session_id")
+    if login_session_id is not None:
+        login_session_id = login_session_id.value
     assert response.status_code == status_code
     assert response.json() == info_dict
