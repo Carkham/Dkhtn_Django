@@ -2,6 +2,7 @@ import json
 
 from django.conf import settings
 from django.contrib import auth
+from django.contrib.auth.hashers import make_password
 from django.http import JsonResponse
 
 from ..utils.json_req_parser import JsonReq
@@ -212,6 +213,43 @@ def username_change(request):
                 "message": "用户名修改成功",
             }
             return JsonResponse(response)
+    except Exception as e:
+        raise e
+        # response = {
+        #     "code": 114514,
+        #     "message": e.__str__(),
+        # }
+        # return JsonResponse(response)
+
+
+@wrapper_modify
+def password_change(request):
+    """
+    修改用户密码，需检查登录状态以及同步数据库，其实可以不要modify用login check装饰器
+    :param request:
+    :return:
+    """
+    try:
+        _request = JsonReq(request)
+        new_password = make_password(_request.POST.get('password'))
+
+        users = User.objects.filter(id=request.userinfo['id'])
+        if len(users) <= 0:
+            response = {
+                "code": 2,
+                "message": "用户不存在",
+            }
+            return JsonResponse(response)
+        user = users[0]
+
+        user.password = new_password
+        # 同步到数据库
+        user.save()
+        response = {
+            "code": 0,
+            "message": "success",
+        }
+        return JsonResponse(response)
     except Exception as e:
         raise e
         # response = {
