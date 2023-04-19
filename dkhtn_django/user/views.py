@@ -95,8 +95,8 @@ def login(request):
 @wrapper_register
 def register(request):
     """
-    注册，流程为->（前端）先调用获取邮箱验证码接口->（后端）发送验证邮件，建立session id，存储验证码，反馈前端
-    ->（前端）调用用户注册接口->（后端）检验session id，检验验证码，注册成功则直接登录
+    注册，流程为->（前端）先调用获取邮箱验证码接口->（后端）发送验证邮件，建立session id，存储验证码，
+    反馈前端->（前端）调用用户注册接口->（后端）检验session id，检验验证码，注册成功则直接登录
     :param request:
     :return:
     """
@@ -141,4 +141,3 @@ def register(request):
         #     "message": e.__str__(),
         # }
         # return JsonResponse(response)
-
