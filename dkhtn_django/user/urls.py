@@ -6,6 +6,7 @@ urlpatterns = [
     path("rsa-pub", user_views.rsa_get),
     path("login", user_views.login),
     path("register", user_views.register),
+    path("info", user_views.userinfo_get),
 
     # email
     path("email-send", user_views.email_send),
