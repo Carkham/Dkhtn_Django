@@ -60,15 +60,23 @@ def redis_user_read(request):
     :param request:
     :return:
     """
-    userinfo = redis_utils.redis_get(settings.REDIS_DB_LOGIN, request.COOKIES[settings.REDIS_SESSION_NAME])
-    if userinfo is None:
+    try:
+        userinfo = redis_utils.redis_get(settings.REDIS_DB_LOGIN, request.COOKIES[settings.REDIS_SESSION_NAME])
+        if userinfo is None:
+            response = {
+                "code": 1,
+                "message": "用户未登录",
+            }
+            return JsonResponse(response)
+        request.userinfo = json.loads(userinfo)
+        return None
+    except Exception as e:
+        e.__str__()
         response = {
             "code": 1,
             "message": "用户未登录",
         }
         return JsonResponse(response)
-    request.userinfo = json.loads(userinfo)
-    return None
 
 
 def verify_session_get(request):
