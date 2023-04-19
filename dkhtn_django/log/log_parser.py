@@ -3,7 +3,7 @@ import abc
 from abc import ABC
 from datetime import datetime
 
-from dkhtn_django.log.model import LogMessage
+from dkhtn_django.log.models import LogMessage
 
 
 class AbstractLogParser(ABC):
