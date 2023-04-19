@@ -72,7 +72,7 @@ def test_email_send(client, url, status_code, info_dict):
         ),
     ]
 )
-def test_(client, url, info, status_code, info_dict):
+def test_email_check(client, url, info, status_code, info_dict):
     session_id = "12345"
     redis_set(settings.REDIS_DB_VERIFY, session_id, "邮箱验证码2233", settings.REDIS_VERIFY_TIMEOUT)
     client.cookies.__setitem__("session_id", session_id)
@@ -423,7 +423,7 @@ def test_name_change_login(client, url, info, status_code, info_dict):
         ),
     ]
 )
-def test_name_change_logout(client, url, info, status_code, info_dict):
+def test_password_change_logout(client, url, info, status_code, info_dict):
     global user_number
     response = client.post(url, data=json.dumps(info), content_type='applications/json')
     assert response.status_code == status_code
