@@ -54,6 +54,23 @@ def redis_login_update(request, response):
     redis_utils.redis_set(settings.REDIS_DB_LOGIN, request.userinfo['id'], new_session_id)
 
 
+def redis_user_read(request):
+    """
+    从redis中根据session id读取用户信息
+    :param request:
+    :return:
+    """
+    userinfo = redis_utils.redis_get(settings.REDIS_DB_LOGIN, request.COOKIES[settings.REDIS_SESSION_NAME])
+    if userinfo is None:
+        response = {
+            "code": 1,
+            "message": "用户未登录",
+        }
+        return JsonResponse(response)
+    request.userinfo = json.loads(userinfo)
+    return None
+
+
 def verify_session_get(request):
     """
     将生成的验证码置入session中
@@ -190,6 +207,26 @@ def wrapper_register(func):
         if ret_code_check(ret):
             verify_code_delete(request)
             redis_login_update(request, ret)
+        return ret
+
+    return inner
+
+
+def wrapper_userinfo_read(func):
+    """
+    只检查登陆状态，不含修改
+    :param func:
+    :return:
+    """
+    def inner(request, *args, **kwargs):
+        # 在调用view函数前执行
+        ret = redis_user_read(request)
+        if ret is not None:
+            return ret
+        # 调用view函数
+        ret = func(request, *args, **kwargs)
+        # 在调用view函数后执行
+        pass
         return ret
 
     return inner
