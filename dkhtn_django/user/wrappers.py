@@ -87,6 +87,15 @@ def verify_code_check(request):
         return None
 
 
+def verify_code_delete(request):
+    """
+    及时删除redis中的邮箱验证码
+    :param request:
+    :return:
+    """
+    redis_utils.redis_delete(settings.REDIS_DB_VERIFY, request.COOKIES[settings.REDIS_SESSION_NAME])
+
+
 def wrapper_set_login(func):
     """
     login接口专用，设置为无条件登录，并且拒绝多点登录
@@ -156,5 +165,31 @@ def wrapper_verify_check(func):
         # if ret_code_check(ret):
         #     ret.set_cookie(settings.REDIS_SESSION_NAME, session_id)
         # return ret
+
+    return inner
+
+
+def wrapper_register(func):
+    """
+    检查session id是否存在，检查验证码
+    调用register，进行注册
+    设置redis，自动登录
+    :param func:
+    :return:
+    """
+    def inner(request, *args, **kwargs):
+        # 在调用view函数前执行
+        # 验证邮件
+        ret = verify_code_check(request)
+        if ret is not None:
+            return ret
+        # 调用view函数
+        ret = func(request, *args, **kwargs)
+        # 在调用view函数后执行
+        # 写入redis，完成登录，redis中删除使用过的验证码
+        if ret_code_check(ret):
+            verify_code_delete(request)
+            redis_login_update(request, ret)
+        return ret
 
     return inner
