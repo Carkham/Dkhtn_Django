@@ -404,3 +404,71 @@ def test_name_change_login(client, url, info, status_code, info_dict):
     response = client.post(url, data=json.dumps(info), content_type='applications/json')
     assert response.status_code == status_code
     assert response.json() == info_dict
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "url, info, status_code, info_dict",
+    [
+        (
+            "/api/user/uname-change",
+            {
+                "uname": "修改后的用户名",
+            },
+            200,
+            {
+                "code": 1,
+                "message": "用户未登录",
+            }
+        ),
+    ]
+)
+def test_name_change_logout(client, url, info, status_code, info_dict):
+    global user_number
+    response = client.post(url, data=json.dumps(info), content_type='applications/json')
+    assert response.status_code == status_code
+    assert response.json() == info_dict
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "url, info, status_code, info_dict",
+    [
+        (
+            "/api/user/password-change",
+            {
+                "password": "修改后的密码",
+            },
+            200,
+            {
+                "code": 0,
+                "message": "success",
+            }
+        ),
+        (
+            "/api/user/password-change",
+            {
+                "password": "修改后的密码",
+            },
+            200,
+            {
+                "code": 2,
+                "message": "用户不存在",
+            }
+        ),
+    ]
+)
+def test_password_change_login(client, url, info, status_code, info_dict):
+    global user_number
+    session_id = "username_change_test"
+    User.objects.create_user(username="用户名",
+                             password="rsa加密的用户密码字符串",
+                             avatar="用户头像",
+                             email="邮箱号")
+    redis_set(settings.REDIS_DB_LOGIN, session_id,
+              json.dumps({"id": 12, "username": "用户名", "avatar": "用户头像", "email": "邮箱号"}),
+              settings.REDIS_TIMEOUT)
+    client.cookies.__setitem__("session_id", session_id)
+    response = client.post(url, data=json.dumps(info), content_type='applications/json')
+    assert response.status_code == status_code
+    assert response.json() == info_dict
