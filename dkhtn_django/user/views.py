@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from ..utils.json_req_parser import JsonReq
 from .rabbit.RabbitMQ import rabbit_mq
 from .wrappers import wrapper_set_login, wrapper_verify_send, wrapper_verify_check, wrapper_register, \
-    wrapper_userinfo_read
+    wrapper_userinfo_read, wrapper_modify
 from .models import User
 
 
@@ -163,6 +163,55 @@ def userinfo_get(request):
             "data": data,
         }
         return JsonResponse(response)
+    except Exception as e:
+        raise e
+        # response = {
+        #     "code": 114514,
+        #     "message": e.__str__(),
+        # }
+        # return JsonResponse(response)
+
+
+@wrapper_modify
+def username_change(request):
+    """
+    修改用户名，需检查登录状态以及同步redis与数据库
+    :param request:
+    :return:
+    """
+    try:
+        _request = JsonReq(request)
+        new_username = _request.POST.get('uname')
+        user_repeat = User.objects.filter(username=new_username)
+        # 检查重名
+        if user_repeat:
+            response = {
+                "code": 2,
+                "message": "用户名已存在",
+            }
+            return JsonResponse(response)
+        else:
+            # 修改用户名，用户id唯一所以结果一定唯一
+            # 大离谱事件，如果user = User.objects.filter(id=request.userinfo['id'])
+            # 然后user[0].username = new_username，会发现user[0]修改失败，然鹅下面这样写不会失败
+            users = User.objects.filter(id=request.userinfo['id'])
+            if len(users) <= 0:
+                response = {
+                    "code": 3,
+                    "message": "用户不存在",
+                }
+                return JsonResponse(response)
+            user = users[0]
+            user.username = new_username
+            # 修改信息登记
+            request.userinfo['username'] = new_username
+            # 同步到数据库
+            user.save()
+            response = {
+                "code": 0,
+                "message": "用户名修改成功",
+            }
+            return JsonResponse(response)
     except Exception as e:
         raise e
         # response = {
