@@ -163,3 +163,86 @@ def test_login(client, url, info, status_code, info_dict):
         login_session_id = login_session_id.value
     assert response.status_code == status_code
     assert response.json() == info_dict
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "url, info, status_code, info_dict",
+    [
+        (
+            "/api/user/register",
+            {
+                "uname": "用户名",
+                "avatar": "用户头像",
+                "email": "邮箱号",
+                "email_sms": "邮箱校验码",
+                "password": "rsa加密的用户密码字符串"
+            },
+            200,
+            {
+                "code": 1,
+                "message": "邮箱验证码错误或已失效",
+            }
+        ),
+        (
+            "/api/user/register",
+            {
+                "uname": "用户名",
+                "avatar": "用户头像",
+                "email": "邮箱号2",
+                "email_sms": "邮箱验证码2233",
+                "password": "rsa加密的用户密码字符串"
+            },
+            200,
+            {
+                "code": 2,
+                "message": "用户名已存在",
+            }
+        ),
+        (
+            "/api/user/register",
+            {
+                "uname": "用户名2",
+                "avatar": "用户头像",
+                "email": "邮箱号",
+                "email_sms": "邮箱验证码2233",
+                "password": "rsa加密的用户密码字符串"
+            },
+            200,
+            {
+                "code": 3,
+                "message": "邮箱已存在",
+            }
+        ),
+        (
+            "/api/user/register",
+            {
+                "uname": "用户名2",
+                "avatar": "用户头像",
+                "email": "邮箱号2",
+                "email_sms": "邮箱验证码2233",
+                "password": "rsa加密的用户密码字符串"
+            },
+            200,
+            {
+                "code": 0,
+                "message": "注册成功",
+            }
+        ),
+    ]
+)
+def test_register(client, url, info, status_code, info_dict):
+    session_id = "register_test"
+    redis_set(settings.REDIS_DB_VERIFY, session_id, "邮箱验证码2233", settings.REDIS_VERIFY_TIMEOUT)
+    username = "用户名"
+    password = "rsa加密的用户密码字符串"
+    avatar = "2"
+    email = "邮箱号"
+    User.objects.create_user(username=username,
+                             password=password,
+                             avatar=avatar,
+                             email=email)
+    client.cookies.__setitem__("session_id", session_id)
+    response = client.post(url, data=json.dumps(info), content_type='applications/json')
+    assert response.status_code == status_code
+    assert response.json() == info_dict

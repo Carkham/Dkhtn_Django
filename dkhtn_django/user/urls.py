@@ -5,6 +5,7 @@ urlpatterns = [
     # user urls
     path("rsa-pub", user_views.rsa_get),
     path("login", user_views.login),
+    path("register", user_views.register),
 
     # email
     path("email-send", user_views.email_send),
