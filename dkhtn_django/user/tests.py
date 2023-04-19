@@ -152,9 +152,9 @@ def test_login(client, url, info, status_code, info_dict):
     avatar = "2"
     email = "yonghuming"
     User.objects.create_user(username=username,
-                                    password=password,
-                                    avatar=avatar,
-                                    email=email)
+                             password=password,
+                             avatar=avatar,
+                             email=email)
     if login_session_id is not None:
         client.cookies.__setitem__("session_id", login_session_id)
     response = client.post(url, data=json.dumps(info), content_type='applications/json')

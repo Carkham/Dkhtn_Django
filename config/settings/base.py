@@ -332,4 +332,3 @@ REDIS_SESSION_NAME = "session_id"
 REDIS_DB_LOGIN = 'default'
 # 邮箱验证所在redis
 REDIS_DB_VERIFY = '1'
-
