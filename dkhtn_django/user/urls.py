@@ -7,6 +7,7 @@ urlpatterns = [
     path("login", user_views.login),
     path("register", user_views.register),
     path("info", user_views.userinfo_get),
+    path("uname-change", user_views.username_change),
 
     # email
     path("email-send", user_views.email_send),

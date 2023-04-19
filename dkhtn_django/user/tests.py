@@ -6,6 +6,8 @@ from django.conf import settings
 from dkhtn_django.user.models import User
 from dkhtn_django.utils.redis_utils import redis_set
 
+user_number = 1
+
 
 @pytest.fixture()
 def client():
@@ -155,6 +157,8 @@ def test_login(client, url, info, status_code, info_dict):
                              password=password,
                              avatar=avatar,
                              email=email)
+    global user_number
+    user_number += 1
     if login_session_id is not None:
         client.cookies.__setitem__("session_id", login_session_id)
     response = client.post(url, data=json.dumps(info), content_type='applications/json')
@@ -242,6 +246,8 @@ def test_register(client, url, info, status_code, info_dict):
                              password=password,
                              avatar=avatar,
                              email=email)
+    global user_number
+    user_number += 1
     client.cookies.__setitem__("session_id", session_id)
     response = client.post(url, data=json.dumps(info), content_type='applications/json')
     assert response.status_code == status_code
@@ -316,5 +322,85 @@ def test_userinfo_login(client, url, status_code, info_dict):
               settings.REDIS_TIMEOUT)
     client.cookies.__setitem__("session_id", session_id)
     response = client.get(url)
+    assert response.status_code == status_code
+    assert response.json() == info_dict
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "url, info, status_code, info_dict",
+    [
+        (
+            "/api/user/uname-change",
+            {
+                "uname": "修改后的用户名",
+            },
+            200,
+            {
+                "code": 1,
+                "message": "用户未登录",
+            }
+        ),
+    ]
+)
+def test_name_change_logout(client, url, info, status_code, info_dict):
+    response = client.post(url, data=json.dumps(info), content_type='applications/json')
+    assert response.status_code == status_code
+    assert response.json() == info_dict
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "url, info, status_code, info_dict",
+    [
+        (
+            "/api/user/uname-change",
+            {
+                "uname": "修改后的用户名",
+            },
+            200,
+            {
+                "code": 0,
+                "message": "用户名修改成功",
+            }
+        ),
+        (
+            "/api/user/uname-change",
+            {
+                "uname": "修改后的用户名",
+            },
+            200,
+            {
+                "code": 3,
+                "message": "用户不存在",
+            }
+        ),
+        (
+            "/api/user/uname-change",
+            {
+                "uname": "用户名",
+            },
+            200,
+            {
+                "code": 2,
+                "message": "用户名已存在",
+            }
+        ),
+    ]
+)
+def test_name_change_login(client, url, info, status_code, info_dict):
+    global user_number
+    session_id = "username_change_test"
+    User.objects.create_user(username="用户名",
+                             password="rsa加密的用户密码字符串",
+                             avatar="用户头像",
+                             email="邮箱号")
+    user_number += 1
+    redis_set(settings.REDIS_DB_LOGIN, session_id,
+              json.dumps({"id": user_number, "username": "用户名", "avatar": "用户头像", "email": "邮箱号"}),
+              settings.REDIS_TIMEOUT)
+    user_number -= 1  # 测试修改重名
+    client.cookies.__setitem__("session_id", session_id)
+    response = client.post(url, data=json.dumps(info), content_type='applications/json')
     assert response.status_code == status_code
     assert response.json() == info_dict

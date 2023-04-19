@@ -79,6 +79,15 @@ def redis_user_read(request):
         return JsonResponse(response)
 
 
+def redis_user_write(request):
+    try:
+        user_info_json = json.dumps(request.userinfo)
+        redis_utils.redis_set(settings.REDIS_DB_LOGIN, request.COOKIES[settings.REDIS_SESSION_NAME], user_info_json)
+    except Exception as e:
+        e.__str__()
+        pass
+
+
 def verify_session_get(request):
     """
     将生成的验证码置入session中
@@ -235,6 +244,28 @@ def wrapper_userinfo_read(func):
         ret = func(request, *args, **kwargs)
         # 在调用view函数后执行
         pass
+        return ret
+
+    return inner
+
+
+def wrapper_modify(func):
+    """
+    登录验证+修改保存到redis
+    :param func:
+    :return:
+    """
+    def inner(request, *args, **kwargs):
+        # 在调用view函数前执行
+        ret = redis_user_read(request)
+        if ret is not None:
+            return ret
+        # 调用view函数
+        ret = func(request, *args, **kwargs)
+        # 在调用view函数后执行
+        # 写入redis，完成登录，redis中删除使用过的验证码
+        if ret_code_check(ret):
+            redis_user_write(request)
         return ret
 
     return inner
