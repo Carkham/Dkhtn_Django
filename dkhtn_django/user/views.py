@@ -6,7 +6,8 @@ from django.http import JsonResponse
 
 from ..utils.json_req_parser import JsonReq
 from .rabbit.RabbitMQ import rabbit_mq
-from .wrappers import wrapper_set_login, wrapper_verify_send, wrapper_verify_check, wrapper_register
+from .wrappers import wrapper_set_login, wrapper_verify_send, wrapper_verify_check, wrapper_register, \
+    wrapper_userinfo_read
 from .models import User
 
 
@@ -132,6 +133,34 @@ def register(request):
         response = {
             "code": 0,
             "message": "注册成功",
+        }
+        return JsonResponse(response)
+    except Exception as e:
+        raise e
+        # response = {
+        #     "code": 114514,
+        #     "message": e.__str__(),
+        # }
+        # return JsonResponse(response)
+
+
+@wrapper_userinfo_read
+def userinfo_get(request):
+    """
+    获取用户信息接口，只需检查登录状态
+    :param request:
+    :return:
+    """
+    try:
+        data = {
+            "uname": request.userinfo['username'],
+            "avatar": request.userinfo['avatar'],
+            "email": request.userinfo['email'],
+        }
+        response = {
+            "code": 0,
+            "message": "success",
+            "data": data,
         }
         return JsonResponse(response)
     except Exception as e:
