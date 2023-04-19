@@ -4,6 +4,7 @@ import pytest
 from django.test import Client
 from django.conf import settings
 from dkhtn_django.user.models import User
+from dkhtn_django.utils.redis_utils import redis_set
 
 
 @pytest.fixture()
@@ -35,6 +36,45 @@ def client():
 )
 def test_email_send(client, url, status_code, info_dict):
     response = client.get(url)
+    assert response.status_code == status_code
+    assert response.json() == info_dict
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "url, info, status_code, info_dict",
+    [
+        (
+            "/api/user/email-check",
+            {
+                "email": "邮箱",
+                "email_sms": "邮箱验证码"
+            },
+            200,
+            {
+                "code": 1,
+                "message": "邮箱验证码错误或已失效"
+            }
+        ),
+        (
+            "/api/user/email-check",
+            {
+                "email": "邮箱",
+                "email_sms": "邮箱验证码2233"
+            },
+            200,
+            {
+                "code": 0,
+                "message": "success",
+            }
+        ),
+    ]
+)
+def test_(client, url, info, status_code, info_dict):
+    session_id = "12345"
+    redis_set(settings.REDIS_DB_VERIFY, session_id, "邮箱验证码2233", settings.REDIS_VERIFY_TIMEOUT)
+    client.cookies.__setitem__("session_id", session_id)
+    response = client.post(url, data=json.dumps(info), content_type='applications/json')
     assert response.status_code == status_code
     assert response.json() == info_dict
 
