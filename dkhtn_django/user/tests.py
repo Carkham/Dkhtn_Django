@@ -246,3 +246,75 @@ def test_register(client, url, info, status_code, info_dict):
     response = client.post(url, data=json.dumps(info), content_type='applications/json')
     assert response.status_code == status_code
     assert response.json() == info_dict
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "url, status_code, info_dict",
+    [
+        (
+            "/api/user/info",
+            200,
+            {
+                "code": 1,
+                "message": "用户未登录"
+            }
+        ),
+    ]
+)
+def test_userinfo_logout_without_session_id(client, url, status_code, info_dict):
+    response = client.get(url)
+    assert response.status_code == status_code
+    assert response.json() == info_dict
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "url, status_code, info_dict",
+    [
+        (
+            "/api/user/info",
+            200,
+            {
+                "code": 1,
+                "message": "用户未登录"
+            }
+        ),
+    ]
+)
+def test_userinfo_logout_with_session_id(client, url, status_code, info_dict):
+    session_id = "userinfo_test_logout"
+    client.cookies.__setitem__("session_id", session_id)
+    response = client.get(url)
+    assert response.status_code == status_code
+    assert response.json() == info_dict
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "url, status_code, info_dict",
+    [
+        (
+            "/api/user/info",
+            200,
+            {
+                "code": 0,
+                "message": "success",
+                "data": {
+                    "uname": "用户名",
+                    "avatar": "用户头像",
+                    "email": "邮箱号",
+                }
+            }
+        ),
+    ]
+)
+def test_userinfo_login(client, url, status_code, info_dict):
+    session_id = "userinfo_test"
+    redis_set(settings.REDIS_DB_LOGIN, session_id,
+              json.dumps({"id": 67, "username": "用户名", "avatar": "用户头像", "email": "邮箱号"}),
+              settings.REDIS_TIMEOUT)
+    client.cookies.__setitem__("session_id", session_id)
+    response = client.get(url)
+    assert response.status_code == status_code
+    assert response.json() == info_dict
