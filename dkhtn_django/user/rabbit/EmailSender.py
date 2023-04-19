@@ -1,3 +1,4 @@
+import json
 import random
 import smtplib
 from email.mime.text import MIMEText
@@ -7,6 +8,8 @@ import threading
 
 from config.settings.base import EMAIL_FROM, EMAIL_TITLE, EMAIL_HOST, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD
 from config.settings.base import rabbitmq_host
+from dkhtn_django.utils import redis_utils
+from django.conf import settings
 
 html_head = """<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
@@ -157,25 +160,31 @@ html_end = """</button>
 """
 
 
-def send_email(email):
+def send_email(json_message):
+    message = json.loads(json_message)
+    email = message['email']
+    session_id = message['session_id']
     sms_code = '%06d' % random.randint(0, 999999)
+
+    redis_utils.redis_set(settings.REDIS_DB_VERIFY, session_id, sms_code, settings.REDIS_VERIFY_TIMEOUT)
+
     context = html_head + sms_code + html_end
     message = MIMEText(context, 'html', 'utf-8')
     message['Subject'] = EMAIL_TITLE
     message['From'] = EMAIL_FROM
     message['To'] = email
 
-    smtpObj = smtplib.SMTP()
-    smtpObj.connect(EMAIL_HOST, 25)
-    smtpObj.login(EMAIL_HOST_USER, EMAIL_HOST_PASSWORD)
-    smtpObj.sendmail(EMAIL_FROM, [email], message.as_string())
-    smtpObj.quit()
+    smtp_obj = smtplib.SMTP()
+    smtp_obj.connect(EMAIL_HOST, 25)
+    smtp_obj.login(EMAIL_HOST_USER, EMAIL_HOST_PASSWORD)
+    smtp_obj.sendmail(EMAIL_FROM, [email], message.as_string())
+    smtp_obj.quit()
 
 
 class AMQPConsuming(threading.Thread):
-    def callback(self, ch, method, properties, email):
+    def callback(self, ch, method, properties, message):
         # do something
-        send_email(email.decode("utf-8"))
+        send_email(message.decode("utf-8"))
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
     @staticmethod
