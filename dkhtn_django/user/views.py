@@ -322,11 +322,6 @@ def avatar_change(request):
         _request = JsonReq(request)
         new_avatar = _request.POST.get('avatar')
 
-        for i in range(300):
-            fuck = User.objects.filter(id=i)
-            if len(fuck) > 0:
-                print("cnm " + str(i))
-
         flag, user = user_exist_check(request, 2)
         if not flag:
             return user
