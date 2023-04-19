@@ -325,6 +325,7 @@ ooCEG6gQIkg16Hz5HwIDAQAB
 
 # redis缓存默认失效时间
 REDIS_TIMEOUT = 60 * 60 * 24 * 7
+REDIS_VERIFY_TIMEOUT = 60 * 15
 # session id 字段命名
 REDIS_SESSION_NAME = "session_id"
 # 登录信息所在redis

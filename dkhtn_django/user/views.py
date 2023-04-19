@@ -1,14 +1,17 @@
+import json
+
 from django.conf import settings
 from django.contrib import auth
 from django.http import JsonResponse
 
 from ..utils.json_req_parser import JsonReq
 from .rabbit.RabbitMQ import rabbit_mq
-from .wrappers import wrapper_set_login
+from .wrappers import wrapper_set_login, wrapper_verify_send
 from .models import User
 
 
-def email_send(request):
+@wrapper_verify_send
+def email_send(request, session_id):
     _request = JsonReq(request)
     email = _request.GET.get('email')
     if email is None:
@@ -18,7 +21,10 @@ def email_send(request):
         }
         return JsonResponse(ret)
     else:
-        rabbit_mq(email)
+        rabbit_mq(json.dumps({
+            "email": email,
+            "session_id": session_id,
+        }))
         ret = {
             "code": 0,
             "message": "验证码发送成功",
