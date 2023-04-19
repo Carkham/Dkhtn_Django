@@ -3,6 +3,7 @@ import json
 import pytest
 from django.test import Client
 from django.conf import settings
+from dkhtn_django.user.models import User
 
 
 @pytest.fixture()
@@ -63,18 +64,30 @@ def test_rsa_get(client, url, status_code, info_dict):
 @pytest.mark.parametrize(
     "url, info, status_code, info_dict",
     [
-        # (
-        #     "/api/user/login",
-        #     {
-        #         "uname": "用户名",
-        #         "password": "rsa加密的用户密码字符串"
-        #     },
-        #     200,
-        #     {
-        #         "code": 0,
-        #         "message": "登录成功",
-        #     }
-        # ),
+        (
+            "/api/user/login",
+            {
+                "uname": "用户名",
+                "password": "rsa加密的用户密码字符串"
+            },
+            200,
+            {
+                "code": 0,
+                "message": "登录成功",
+            }
+        ),
+        (
+            "/api/user/login",
+            {
+                "uname": "yonghuming",
+                "password": "rsa加密的用户密码字符串"
+            },
+            200,
+            {
+                "code": 0,
+                "message": "登录成功",
+            }
+        ),
         (
             "/api/user/login",
             {
@@ -90,6 +103,14 @@ def test_rsa_get(client, url, status_code, info_dict):
     ]
 )
 def test_login(client, url, info, status_code, info_dict):
+    username = "用户名"
+    password = "rsa加密的用户密码字符串"
+    avatar = "2"
+    email = "yonghuming"
+    user = User.objects.create_user(username=username,
+                                    password=password,
+                                    avatar=avatar,
+                                    email=email)
     response = client.post(url, data=json.dumps(info), content_type='applications/json')
     assert response.status_code == status_code
     assert response.json() == info_dict
