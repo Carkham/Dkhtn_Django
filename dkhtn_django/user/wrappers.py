@@ -263,8 +263,36 @@ def wrapper_modify(func):
         # 调用view函数
         ret = func(request, *args, **kwargs)
         # 在调用view函数后执行
-        # 写入redis，完成登录，redis中删除使用过的验证码
         if ret_code_check(ret):
+            redis_user_write(request)
+        return ret
+
+    return inner
+
+
+def wrapper_email_change(func):
+    """
+    检查登录
+    检查验证码
+    设置redis
+    :param func:
+    :return:
+    """
+    def inner(request, *args, **kwargs):
+        # 在调用view函数前执行
+        # 检验登录
+        ret = redis_user_read(request)
+        if ret is not None:
+            return ret
+        # 验证邮件
+        ret = verify_code_check(request)
+        if ret is not None:
+            return ret
+        # 调用view函数
+        ret = func(request, *args, **kwargs)
+        # 在调用view函数后执行
+        if ret_code_check(ret):
+            verify_code_delete(request)
             redis_user_write(request)
         return ret
 
