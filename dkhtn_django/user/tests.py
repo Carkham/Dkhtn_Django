@@ -151,7 +151,7 @@ def test_login(client, url, info, status_code, info_dict):
     password = "rsa加密的用户密码字符串"
     avatar = "2"
     email = "yonghuming"
-    user = User.objects.create_user(username=username,
+    User.objects.create_user(username=username,
                                     password=password,
                                     avatar=avatar,
                                     email=email)
