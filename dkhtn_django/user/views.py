@@ -12,6 +12,23 @@ from .wrappers import wrapper_set_login, wrapper_verify_send, wrapper_verify_che
 from .models import User
 
 
+def user_exist_check(request, code):
+    """
+    检查用户是否存在
+    :param request:
+    :return:
+    """
+    users = User.objects.filter(id=request.userinfo['id'])
+    if len(users) <= 0:
+        response = {
+            "code": code,
+            "message": "用户不存在",
+        }
+        return False, JsonResponse(response)
+    user = users[0]
+    return True, user
+
+
 @wrapper_verify_send
 def email_send(request, session_id):
     _request = JsonReq(request)
@@ -195,14 +212,11 @@ def username_change(request):
             # 修改用户名，用户id唯一所以结果一定唯一
             # 大离谱事件，如果user = User.objects.filter(id=request.userinfo['id'])
             # 然后user[0].username = new_username，会发现user[0]修改失败，然鹅下面这样写不会失败
-            users = User.objects.filter(id=request.userinfo['id'])
-            if len(users) <= 0:
-                response = {
-                    "code": 3,
-                    "message": "用户不存在",
-                }
-                return JsonResponse(response)
-            user = users[0]
+
+            flag, user = user_exist_check(request, 3)
+            if not flag:
+                return user
+
             user.username = new_username
             # 修改信息登记
             request.userinfo['username'] = new_username
@@ -233,14 +247,9 @@ def password_change(request):
         _request = JsonReq(request)
         new_password = make_password(_request.POST.get('password'))
 
-        users = User.objects.filter(id=request.userinfo['id'])
-        if len(users) <= 0:
-            response = {
-                "code": 2,
-                "message": "用户不存在",
-            }
-            return JsonResponse(response)
-        user = users[0]
+        flag, user = user_exist_check(request, 2)
+        if not flag:
+            return user
 
         user.password = new_password
         # 同步到数据库
@@ -279,20 +288,9 @@ def email_change(request):
             return JsonResponse(response)
         else:
             # 修改邮箱
-            users = User.objects.filter(id=request.userinfo['id'])
-
-            for i in range(300):
-                fuck = User.objects.filter(id=i)
-                if len(fuck) > 0:
-                    print("cnm " + str(i))
-
-            if len(users) <= 0:
-                response = {
-                    "code": 4,
-                    "message": "用户不存在",
-                }
-                return JsonResponse(response)
-            user = users[0]
+            flag, user = user_exist_check(request, 4)
+            if not flag:
+                return user
 
             user.email = new_email
             # 修改信息登记
@@ -304,6 +302,45 @@ def email_change(request):
                 "message": "邮箱修改成功",
             }
             return JsonResponse(response)
+    except Exception as e:
+        raise e
+        # response = {
+        #     "code": 114514,
+        #     "message": e.__str__(),
+        # }
+        # return JsonResponse(response)
+
+
+@wrapper_modify
+def avatar_change(request):
+    """
+    修改头像，需要确认验证码，需要同步redis与数据库
+    :param request:
+    :return:
+    """
+    try:
+        _request = JsonReq(request)
+        new_avatar = _request.POST.get('avatar')
+
+        for i in range(300):
+            fuck = User.objects.filter(id=i)
+            if len(fuck) > 0:
+                print("cnm " + str(i))
+
+        flag, user = user_exist_check(request, 2)
+        if not flag:
+            return user
+
+        user.avatar = new_avatar
+        # 修改信息登记
+        request.userinfo['avatar'] = new_avatar
+        # 同步到数据库
+        user.save()
+        response = {
+            "code": 0,
+            "message": "头像修改成功",
+        }
+        return JsonResponse(response)
     except Exception as e:
         raise e
         # response = {
