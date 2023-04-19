@@ -8,7 +8,7 @@ from django.http import JsonResponse
 from ..utils.json_req_parser import JsonReq
 from .rabbit.RabbitMQ import rabbit_mq
 from .wrappers import wrapper_set_login, wrapper_verify_send, wrapper_verify_check, wrapper_register, \
-    wrapper_userinfo_read, wrapper_modify
+    wrapper_userinfo_read, wrapper_modify, wrapper_email_change
 from .models import User
 
 
@@ -250,6 +250,60 @@ def password_change(request):
             "message": "success",
         }
         return JsonResponse(response)
+    except Exception as e:
+        raise e
+        # response = {
+        #     "code": 114514,
+        #     "message": e.__str__(),
+        # }
+        # return JsonResponse(response)
+
+
+@wrapper_email_change
+def email_change(request):
+    """
+    修改邮箱，需要确认验证码，需要同步redis与数据库
+    :param request:
+    :return:
+    """
+    try:
+        _request = JsonReq(request)
+        new_email = _request.POST.get('email')
+        user_repeat = User.objects.filter(email=new_email)
+        # 检查重复邮箱
+        if user_repeat:
+            response = {
+                "code": 3,
+                "message": "邮箱已存在",
+            }
+            return JsonResponse(response)
+        else:
+            # 修改邮箱
+            users = User.objects.filter(id=request.userinfo['id'])
+
+            for i in range(300):
+                fuck = User.objects.filter(id=i)
+                if len(fuck) > 0:
+                    print("cnm " + str(i))
+
+            if len(users) <= 0:
+                response = {
+                    "code": 4,
+                    "message": "用户不存在",
+                }
+                return JsonResponse(response)
+            user = users[0]
+
+            user.email = new_email
+            # 修改信息登记
+            request.userinfo['email'] = new_email
+            # 同步到数据库
+            user.save()
+            response = {
+                "code": 0,
+                "message": "邮箱修改成功",
+            }
+            return JsonResponse(response)
     except Exception as e:
         raise e
         # response = {
