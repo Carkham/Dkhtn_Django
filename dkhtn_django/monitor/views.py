@@ -4,7 +4,7 @@ import json
 
 from django.http import HttpResponse
 
-from Dkhtn_Django.dkhtn_django.monitor.models import Resource
+from .models import Resource
 
 states = ["running", "stop"]
 
@@ -37,7 +37,8 @@ def monitor(func_id):
 
 
 def add_item(func_id):
-    Resource.objects.create(function_id=func_id, state=1, running_time=0, call_times=0, error_times=0, cost=0)
+    Resource.objects.create(function_id=func_id, state=1, running_time=0,
+                            call_times=0, error_times=0, cost=0)
 
 
 def delete_item(func_id):
