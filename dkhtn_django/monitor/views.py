@@ -4,7 +4,7 @@ import json
 
 from django.http import HttpResponse
 
-from Dkhtn_Django.dkhtn_django.monitor.models import *
+from Dkhtn_Django.dkhtn_django.monitor.models import Resource
 
 states = ["running", "stop"]
 
