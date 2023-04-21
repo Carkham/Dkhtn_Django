@@ -1,4 +1,6 @@
 import json
+import rsa
+import base64
 
 from django.conf import settings
 from django.contrib import auth
@@ -86,6 +88,8 @@ def login(request):
         _request = JsonReq(request)
         username = _request.POST.get('uname')
         password = _request.POST.get('password')
+        password = decrypt(password)
+        print("debug_login:" + username + " " + make_password(password))
         user = auth.authenticate(username=username, password=password)
         if user is None:
             response = {
@@ -123,6 +127,7 @@ def register(request):
         _request = JsonReq(request)
         username = _request.POST.get('uname')
         password = _request.POST.get('password')
+        password = decrypt(password)
         email = _request.POST.get('email')
         avatar = _request.POST.get('avatar')
         # 检查重名
@@ -152,6 +157,7 @@ def register(request):
             "code": 0,
             "message": "注册成功",
         }
+        print("debug_register:" + username + " " + make_password(password))
         return JsonResponse(response)
     except Exception as e:
         raise e
@@ -245,7 +251,9 @@ def password_change(request):
     """
     try:
         _request = JsonReq(request)
-        new_password = make_password(_request.POST.get('password'))
+        password = _request.POST.get('password')
+        password = decrypt(password)
+        new_password = make_password(password)
 
         flag, user = user_exist_check(request, 2)
         if not flag:
@@ -258,6 +266,7 @@ def password_change(request):
             "code": 0,
             "message": "success",
         }
+        print("debug_password_change:" + new_password)
         return JsonResponse(response)
     except Exception as e:
         raise e
@@ -343,3 +352,10 @@ def avatar_change(request):
         #     "message": e.__str__(),
         # }
         # return JsonResponse(response)
+
+
+def decrypt(decrypt_content):
+    pri_key = rsa.PrivateKey.load_pkcs1(settings.RSA_PRIVATE_KEY)
+    strs = base64.b64decode(bytes(decrypt_content, 'utf-8'))
+    decrypt_str = rsa.decrypt(strs, pri_key).decode('utf-8')
+    return decrypt_str
