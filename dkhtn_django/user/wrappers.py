@@ -109,8 +109,10 @@ def verify_code_check(request):
     :param request:
     :return:
     """
-    verify_message = json.loads(redis_utils.redis_get(settings.REDIS_DB_VERIFY,
-                                                      request.COOKIES[settings.REDIS_SESSION_NAME]))
+    verify_message = redis_utils.redis_get(settings.REDIS_DB_VERIFY,
+                                           request.COOKIES[settings.REDIS_SESSION_NAME])
+    if verify_message is not None:
+        verify_message = json.loads(verify_message)
     _request = JsonReq(request)
     if verify_message is None or verify_message['sms_code'] != _request.POST.get('email_sms'):
         response = {
@@ -129,9 +131,10 @@ def verify_email_check(request):
     :param request:
     :return:
     """
-    verify_message = json.loads(redis_utils.redis_get(settings.REDIS_DB_VERIFY,
-                                                      request.COOKIES[settings.REDIS_SESSION_NAME]))
-    _request = JsonReq(request)
+    verify_message = redis_utils.redis_get(settings.REDIS_DB_VERIFY,
+                                           request.COOKIES[settings.REDIS_SESSION_NAME])
+    if verify_message is not None:
+        verify_message = json.loads(verify_message)
     if verify_message is None:
         response = {
             "code": 1,
