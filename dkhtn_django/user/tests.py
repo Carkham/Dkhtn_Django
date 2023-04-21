@@ -74,7 +74,11 @@ def test_email_send(client, url, status_code, info_dict):
 )
 def test_email_check(client, url, info, status_code, info_dict):
     session_id = "12345"
-    redis_set(settings.REDIS_DB_VERIFY, session_id, "邮箱验证码2233", settings.REDIS_VERIFY_TIMEOUT)
+    verify_message = {
+        "email": "邮箱号",
+        "sms_code": "邮箱验证码2233",
+    }
+    redis_set(settings.REDIS_DB_VERIFY, session_id, json.dumps(verify_message), settings.REDIS_VERIFY_TIMEOUT)
     client.cookies.__setitem__("session_id", session_id)
     response = client.post(url, data=json.dumps(info), content_type='applications/json')
     assert response.status_code == status_code
@@ -237,7 +241,11 @@ def test_login(client, url, info, status_code, info_dict):
 )
 def test_register(client, url, info, status_code, info_dict):
     session_id = "register_test"
-    redis_set(settings.REDIS_DB_VERIFY, session_id, "邮箱验证码2233", settings.REDIS_VERIFY_TIMEOUT)
+    verify_message = {
+        "email": "邮箱号",
+        "sms_code": "邮箱验证码2233",
+    }
+    redis_set(settings.REDIS_DB_VERIFY, session_id, json.dumps(verify_message), settings.REDIS_VERIFY_TIMEOUT)
     username = "用户名"
     password = "rsa加密的用户密码字符串"
     avatar = "2"
@@ -554,7 +562,11 @@ def test_email_change_logout(client, url, info, status_code, info_dict):
 )
 def test_email_change_login(client, url, info, status_code, info_dict):
     session_id = "12345"
-    redis_set(settings.REDIS_DB_VERIFY, session_id, "邮箱验证码", settings.REDIS_VERIFY_TIMEOUT)
+    verify_message = {
+        "email": "邮箱号",
+        "sms_code": "邮箱验证码",
+    }
+    redis_set(settings.REDIS_DB_VERIFY, session_id, json.dumps(verify_message), settings.REDIS_VERIFY_TIMEOUT)
     client.cookies.__setitem__("session_id", session_id)
     User.objects.create_user(username="用户名",
                              password="rsa加密的用户密码字符串",
