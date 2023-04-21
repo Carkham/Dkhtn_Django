@@ -109,15 +109,37 @@ def verify_code_check(request):
     :param request:
     :return:
     """
-    verify_code = redis_utils.redis_get(settings.REDIS_DB_VERIFY, request.COOKIES[settings.REDIS_SESSION_NAME])
+    verify_message = json.loads(redis_utils.redis_get(settings.REDIS_DB_VERIFY,
+                                                      request.COOKIES[settings.REDIS_SESSION_NAME]))
     _request = JsonReq(request)
-    if verify_code is None or verify_code != _request.POST.get('email_sms'):
+    if verify_message is None or verify_message['sms_code'] != _request.POST.get('email_sms'):
         response = {
             "code": 1,
             "message": "邮箱验证码错误或已失效",
         }
         return JsonResponse(response)
     else:
+        request.email = verify_message['email']
+        return None
+
+
+def verify_email_check(request):
+    """
+    邮箱验证码检验
+    :param request:
+    :return:
+    """
+    verify_message = json.loads(redis_utils.redis_get(settings.REDIS_DB_VERIFY,
+                                                      request.COOKIES[settings.REDIS_SESSION_NAME]))
+    _request = JsonReq(request)
+    if verify_message is None:
+        response = {
+            "code": 1,
+            "message": "邮箱验证码错误或已失效",
+        }
+        return JsonResponse(response)
+    else:
+        request.email = verify_message['email']
         return None
 
 
@@ -293,6 +315,28 @@ def wrapper_email_change(func):
         # 在调用view函数后执行
         if ret_code_check(ret):
             verify_code_delete(request)
+            redis_user_write(request)
+        return ret
+
+    return inner
+
+
+def wrapper_password_change(func):
+    """
+    检验邮箱验证码是否正确
+    :param func:
+    :return:
+    """
+    def inner(request, *args, **kwargs):
+        # 在调用view函数前执行
+        # 验证邮件
+        ret = verify_email_check(request)
+        if ret is not None:
+            return ret
+        # 调用view函数
+        ret = func(request, *args, **kwargs)
+        # 在调用view函数后执行
+        if ret_code_check(ret):
             redis_user_write(request)
         return ret
 

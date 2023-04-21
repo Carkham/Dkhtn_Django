@@ -10,7 +10,7 @@ from django.http import JsonResponse
 from ..utils.json_req_parser import JsonReq
 from .rabbit.RabbitMQ import rabbit_mq
 from .wrappers import wrapper_set_login, wrapper_verify_send, wrapper_verify_check, wrapper_register, \
-    wrapper_userinfo_read, wrapper_modify, wrapper_email_change
+    wrapper_userinfo_read, wrapper_modify, wrapper_email_change, wrapper_password_change
 from .models import User
 
 
@@ -242,7 +242,7 @@ def username_change(request):
         # return JsonResponse(response)
 
 
-@wrapper_modify
+@wrapper_password_change
 def password_change(request):
     """
     修改用户密码，需检查登录状态以及同步数据库，其实可以不要modify用login check装饰器
@@ -255,9 +255,14 @@ def password_change(request):
         password = decrypt(password)
         new_password = make_password(password)
 
-        flag, user = user_exist_check(request, 2)
-        if not flag:
-            return user
+        users = User.objects.filter(email=request.email)
+        if len(users) <= 0:
+            response = {
+                "code": 2,
+                "message": "用户不存在",
+            }
+            return JsonResponse(response)
+        user = users[0]
 
         user.password = new_password
         # 同步到数据库

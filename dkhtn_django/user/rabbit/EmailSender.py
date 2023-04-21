@@ -166,7 +166,12 @@ def send_email(json_message):
     session_id = message['session_id']
     sms_code = '%06d' % random.randint(0, 999999)
 
-    redis_utils.redis_set(settings.REDIS_DB_VERIFY, session_id, sms_code, settings.REDIS_VERIFY_TIMEOUT)
+    verify_message = {
+        "email": email,
+        "sms_code": sms_code,
+    }
+    redis_utils.redis_set(settings.REDIS_DB_VERIFY, session_id,
+                          json.dumps(verify_message), settings.REDIS_VERIFY_TIMEOUT)
 
     context = html_head + sms_code + html_end
     message = MIMEText(context, 'html', 'utf-8')
