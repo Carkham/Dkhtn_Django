@@ -239,7 +239,7 @@ def username_change(request, uid):
                 "code": 0,
                 "message": "用户名修改成功",
             }
-            redis.redis_update_value(settings.REDIS_LOGIN, session_id, user.get_info())
+            redis.redis_update_value(settings.REDIS_LOGIN, session_id, json.dumps(user.get_info()))
             return JsonResponse(response)
     except Exception as e:
         Log().error(e.__str__())
@@ -317,7 +317,7 @@ def email_change(request):
                 "code": 0,
                 "message": "邮箱修改成功",
             }
-            redis.redis_update_value(settings.REDIS_LOGIN, session_id, user.get_info())
+            redis.redis_update_value(settings.REDIS_LOGIN, session_id, json.dumps(user.get_info()))
             return JsonResponse(response)
     except Exception as e:
         Log().error(e.__str__())
@@ -332,6 +332,7 @@ def avatar_change(request, uid):
     :return:
     """
     try:
+        session_id = request.COOKIES.get('session_id')
         data = json.loads(request.body)
         new_avatar = data.get('avatar')
         users = User.objects.filter(id=uid)
@@ -348,6 +349,7 @@ def avatar_change(request, uid):
             "code": 0,
             "message": "头像修改成功",
         }
+        redis.redis_update_value(settings.REDIS_LOGIN, session_id, json.dumps(user.get_info()))
         return JsonResponse(response)
     except Exception as e:
         Log().error(e.__str__())
