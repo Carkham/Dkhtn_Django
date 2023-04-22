@@ -25,13 +25,13 @@ def wrapper_verify_check(func):
         else:
             email_verify = json.loads(email_verify)
         data = json.loads(request.body)
-        print(data.get("email"), email_verify.get("email"), data.get("email_sms"), email_verify.get("email_sms"))
         if data.get("email") != email_verify.get("email") or data.get("email_sms") != email_verify.get("email_sms"):
             response = {
                 "code": 1,
                 "message": "邮箱验证码错误或已失效1",
             }
             return JsonResponse(response)
+        redis.redis_delete(settings.REDIS_VERIFY, request.COOKIES.get("session_id"))
         return func(request)
 
     return inner
