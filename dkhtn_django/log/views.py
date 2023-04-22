@@ -23,8 +23,8 @@ def query_log(request, func_id):
         assert request.method == "GET"
         start_time = request.GET.get("startDatetime")
         end_time = request.GET.get("endDatetime")
-        start_time = datetime.strptime(start_time, "%y-%m-%d %H:%M")
-        end_time = datetime.strptime(end_time, "%y-%m-%d %H:%M")
+        start_time = datetime.strptime(start_time, "%Y-%m-%dT%H:%M")
+        end_time = datetime.strptime(end_time, "%Y-%m-%dT%H:%M")
         level = request.GET.get("level")
         keyword = request.GET.get("keyword")
     except AssertionError:
@@ -47,7 +47,7 @@ def query_log(request, func_id):
     for log in logs:
         response["data"]["logs"].append({
             "level": log.level,
-            "timestamp": log.timestamp,
+            "timestamp": str(log.timestamp),
             "content": log.message
         })
     return JsonResponse(json.dumps(response))
