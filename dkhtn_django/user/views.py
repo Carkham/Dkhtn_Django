@@ -199,7 +199,7 @@ def email_check(request):
             "code": 0,
             "message": "success",
         }
-        redis.redis_set(settings.REDIS_LOGIN, session_id, user.get_info())
+        redis.redis_set(settings.REDIS_LOGIN, session_id, json.dumps(user.get_info()))
         return JsonResponse(ret)
     except Exception as e:
         Log().error(e.__str__())
@@ -254,9 +254,8 @@ def password_change(request, uid):
     :return:
     """
     try:
-        session_id = request.COOKIES.get('session_id')
         data = json.loads(request.body)
-        new_password = data.get('password')
+        new_password = decrypt(data.get('password'))
 
         users = User.objects.filter(id=uid)
         if len(users) == 0:
@@ -272,7 +271,6 @@ def password_change(request, uid):
             "code": 0,
             "message": "success",
         }
-        redis.redis_update_value(settings.REDIS_LOGIN, session_id, user.get_info())
         return JsonResponse(response)
     except Exception as e:
         Log().error(e.__str__())

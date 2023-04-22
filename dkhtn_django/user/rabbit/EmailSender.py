@@ -130,7 +130,7 @@ html_head = """<!DOCTYPE html>
                 <div id="content_top">
                     <strong>尊敬的用户：您好！</strong>
                     <strong>
-                        您正在进行<span>注册账号</span>操作，请在验证码中输入以下验证码完成操作：
+                        您正在进行<span>邮箱验证</span>操作，请在验证码中输入以下验证码完成操作：
                     </strong>
                     <div id="verificationCode">
                         <button class="button" >"""
