@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate
 
 from .models import User
 from .rabbit.RabbitMQ import rabbit_mq
-from .wrappers import wrapper_verify_check, wrapper_login_check
+from .wrappers import wrapper_verify_check
 from ..utils import redis
 from ..utils.log import Log
 from ..utils.rsa_decrypt import decrypt
@@ -64,7 +64,6 @@ def login(request):
         Log().error(e.__str__())
 
 
-@wrapper_verify_check
 def register(request):
     """
     注册，流程为->（前端）先调用获取邮箱验证码接口->（后端）发送验证邮件，建立session id，存储验证码，
@@ -112,11 +111,9 @@ def register(request):
         Log().error(e.__str__())
 
 
-@wrapper_login_check
-def userinfo_get(request, uid):
+def userinfo_get(request):
     """
     获取用户信息接口，只需检查登录状态
-    :param uid: session中的uid
     :param request:
     :return:
     """
@@ -205,15 +202,14 @@ def email_check(request):
         Log().error(e.__str__())
 
 
-@wrapper_login_check
-def username_change(request, uid):
+def username_change(request):
     """
     修改用户名，需检查登录状态以及同步redis与数据库
-    :param uid: 用户id
     :param request:
     :return:
     """
     try:
+        uid = request.uid
         session_id = request.COOKIES.get('session_id')
         data = json.loads(request.body)
         new_username = data.get('uname')
@@ -245,15 +241,14 @@ def username_change(request, uid):
         Log().error(e.__str__())
 
 
-@wrapper_login_check
-def password_change(request, uid):
+def password_change(request):
     """
     修改用户密码，需检查登录状态以及同步数据库
-    :param uid: 用户id
     :param request:
     :return:
     """
     try:
+        uid = request.uid
         data = json.loads(request.body)
         new_password = decrypt(data.get('password'))
 
@@ -323,8 +318,7 @@ def email_change(request):
         Log().error(e.__str__())
 
 
-@wrapper_login_check
-def avatar_change(request, uid):
+def avatar_change(request):
     """
     修改头像，需要确认验证码，需要同步redis与数据库
     :param uid: 用户id
@@ -332,6 +326,7 @@ def avatar_change(request, uid):
     :return:
     """
     try:
+        uid = request.uid
         session_id = request.COOKIES.get('session_id')
         data = json.loads(request.body)
         new_avatar = data.get('avatar')

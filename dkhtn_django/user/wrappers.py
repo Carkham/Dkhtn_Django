@@ -37,25 +37,3 @@ def wrapper_verify_check(func):
     return inner
 
 
-def wrapper_login_check(func):
-    """
-    检查session id是否存在
-    调用login，进行登录
-    设置redis，自动登录
-    :param func:
-    :return:
-    """
-
-    def inner(request):
-        # 验证用户权限
-        user_info = redis.redis_get(settings.REDIS_LOGIN, request.COOKIES.get("session_id"))
-        if user_info is None:
-            response = {
-                "code": 1,
-                "message": "用户未登录",
-            }
-            return JsonResponse(response)
-        uid = json.loads(user_info).get("id")
-        return func(request, uid)
-
-    return inner
