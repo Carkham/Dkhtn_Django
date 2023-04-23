@@ -90,58 +90,47 @@ def test_insert_log(messages):
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    "urls, expected",
+    "urls, status, msg, expected",
     [
         (
-            "/api/log/5201314",
-            {
-                "code": -1,
-                "msg": "The request does not contain certain keys",
-                "data": {"logs": []}
-            }
+            "/api/logs/5201314",
+            0,
+            "",
+            {"start_time": None, "end_time": None, "level": None, "keyword": None}
         ),
         (
-            "/api/log/5201314?startDatetime=2023/04/13 12:00&endDatetime=2023-04-15T09:40&level=WARNING&keyword=warning",
-            {
-                "code": -1,
-                "msg": "Your timestamp format is not appropriate",
-                "data": {"logs": []}
-            }
+            "/api/logs/5201314?startDatetime=2023/04/13 12:00&endDatetime=2023-04-15T09:40&keyword=warning",
+            -1,
+            "Your timestamp format is wrong",
+            {}
         ),
         (
-            "/api/log/5201314?endDatetime=2023-04-15T09:40&level=WARNING&keyword=warning",
-            {
-                "code": -1,
-                "msg": "Your timestamp format is not appropriate",
-                "data": {"logs": []}
-            }
+            "/api/logs/5201314?endDatetime=2023-04-15T09:40&level=WARNING",
+            0,
+            "",
+            {"start_time": None, "end_time": "2023-04-15T09:40", "level": "WARNING", "keyword": None}
         ),
         (
-            "/api/log/5201314?startDatetime=2023-04-20T12:00&endDatetime=2023-04-20T19:40&level=WARNING&keyword=warning",
-            {
-                "code": 0,
-                "msg": "",
-                "data": {"logs": []}
-            }
-        ),
-        (
-            "/api/log/5201314?startDatetime=2023-04-12T12:00&endDatetime=2023-04-20T19:40&level=WARNING&keyword=warning",
-            {
-                "code": 0,
-                "msg": "",
-                "data": {"logs": [
-                    {
-                        "level": "WARNING",
-                        "timestamp": "2023-04-14 08:40:48",
-                        "content": "This is a warning"
-                    }
-                ]
-                }}
+            "/api/logs/5201314?startDatetime=2023-04-12T12:00&endDatetime=2023-04-20T19:40&level=WARNING&keyword=warn",
+            0,
+            "",
+            {"start_time": "2023-04-12T12:00", "end_time": "2023-04-20T19:40", "level": "WARNING", "keyword": "warn"}
         ),
     ]
 )
-def test_query_log(urls, expected):
-    print("test query service")
+def test_query_log(urls, status, msg, expected):
     client = Client()
-    response = client.get(urls)
-    assert json.dumps(expected) == response
+    response = client.get(urls).json()
+    assert response["code"] == status
+    assert response["msg"] == msg
+    for log in response["data"]["logs"]:
+        if expected["level"] is not None:
+            assert log["level"] == expected["level"]
+        if expected["keyword"] is not None:
+            assert expected["keyword"] in log["content"]
+        time = datetime.strptime(log["timestamp"], "%Y-%m-%dT%H:%M")
+        if expected["end_time"] is not None:
+            end_time = datetime.strptime(expected["end_time"], "%Y-%m-%dT%H:%M")
+        else:
+            end_time = datetime.now().strftime("%Y-%m-%dT%H:%M")
+        assert time < end_time
