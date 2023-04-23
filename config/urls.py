@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.urls import include, path
 from django.views import defaults as default_views
 import dkhtn_django.user.urls as user_urls
-
+import dkhtn_django.log.urls as log_urls
 import dkhtn_django.monitor.urls as resource_urls
 
 urlpatterns = [
@@ -12,7 +12,7 @@ urlpatterns = [
 
     # Your stuff: custom urls includes go here
     path("api/user/", include(user_urls)),
-
+    path("api/logs/", include(log_urls)),
     path("api/resource/", include(resource_urls))
 ]
 
