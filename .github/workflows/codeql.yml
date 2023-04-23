@@ -5,10 +5,6 @@ on:
     branches: [ "master", "main", "dev" ]
     paths-ignore: [ "docs/**" ]
 
-  push:
-    branches: [ "master", "main", "dev" ]
-    paths-ignore: [ "docs/**" ]
-
 jobs:
   CodeQL-Build:
     # CodeQL runs on ubuntu-latest, windows-latest, and macos-latest
