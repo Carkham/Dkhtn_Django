@@ -64,6 +64,7 @@ def login(request):
         Log().error(e.__str__())
 
 
+@wrapper_verify_check
 def register(request):
     """
     注册，流程为->（前端）先调用获取邮箱验证码接口->（后端）发送验证邮件，建立session id，存储验证码，

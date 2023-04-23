@@ -9,6 +9,8 @@ class Log(object):
     日志记录
     """
     def __init__(self):
+        if not os.path.exists(settings.LOG_DIR):
+            os.makedirs(settings.LOG_DIR)
         self.logname = os.path.join(settings.LOG_DIR, '%s' % "log")
         self.logger = logging.getLogger('django')
         self.logger.setLevel(logging.DEBUG)
