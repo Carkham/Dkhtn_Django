@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.http import JsonResponse
+from django.utils.timezone import get_current_timezone
 
 from .models import LogMessage
 
@@ -32,8 +33,9 @@ def query_log(request, func_id):
     keyword = "" if keyword is None else keyword
 
     try:
-        start_time = datetime.strptime(start_time, "%Y-%m-%dT%H:%M")
-        end_time = datetime.strptime(end_time, "%Y-%m-%dT%H:%M")
+        tz = get_current_timezone()
+        start_time = tz.localize(datetime.strptime(start_time, "%Y-%m-%dT%H:%M"))
+        end_time = tz.localize(datetime.strptime(end_time, "%Y-%m-%dT%H:%M"))
     except ValueError:
         return request_error(response, "Your timestamp format is wrong")
 
