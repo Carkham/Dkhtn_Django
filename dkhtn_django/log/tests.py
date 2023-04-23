@@ -128,9 +128,9 @@ def test_query_log(urls, status, msg, expected):
             assert log["level"] == expected["level"]
         if expected["keyword"] is not None:
             assert expected["keyword"] in log["content"]
-        time = datetime.strptime(log["timestamp"], "%Y-%m-%dT%H:%M")
+        time = datetime.strptime(log["timestamp"], "%Y-%m-%d %H:%M:%S")
         if expected["end_time"] is not None:
             end_time = datetime.strptime(expected["end_time"], "%Y-%m-%dT%H:%M")
         else:
-            end_time = datetime.now().strftime("%Y-%m-%dT%H:%M")
+            end_time = datetime.now()
         assert time < end_time
