@@ -8,7 +8,7 @@ from .models import Functions
 def resource_query(request):
     response = {"code": 0, "msg": "", "data": []}
     assert request.method == "GET"
-    session_id = request.COOKIES.get("session_id")
+    # session_id = request.COOKIES.get("session_id")
     user_id = "114514"
     resources = Functions.objects.filter(user_id=user_id)
     for resource in resources:

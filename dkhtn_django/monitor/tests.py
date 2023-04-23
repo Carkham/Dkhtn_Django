@@ -1,9 +1,6 @@
 # Create your tests here.
-import json
-
 import pytest
 from django.test import Client
-from .models import Functions
 
 
 @pytest.mark.django_db
