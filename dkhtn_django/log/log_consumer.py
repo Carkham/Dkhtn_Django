@@ -7,6 +7,7 @@ import pika
 
 from config.settings.base import rabbitmq_host
 from dkhtn_django.log.models import LogMessage
+from django.utils.timezone import get_current_timezone
 
 
 class LogConsuming(threading.Thread):
@@ -20,8 +21,9 @@ class LogConsuming(threading.Thread):
         # do something
         logs: List[dict] = json.loads(body.decode("utf-8"))
         ch.basic_ack(delivery_tag=method.delivery_tag)
+        tz = get_current_timezone()
         for log in logs:
-            log["timestamp"] = datetime.strptime(log["timestamp"], "%Y-%m-%d %H:%M:%S")
+            log["timestamp"] = tz.localize(datetime.strptime(log["timestamp"], "%Y-%m-%d %H:%M:%S"))
             message = LogMessage(**log)
             message.save()
 
