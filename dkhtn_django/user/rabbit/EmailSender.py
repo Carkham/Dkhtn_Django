@@ -8,7 +8,7 @@ import threading
 
 from config.settings.base import EMAIL_FROM, EMAIL_TITLE, EMAIL_HOST, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD
 from config.settings.base import rabbitmq_host
-from dkhtn_django.utils import redis_utils
+from dkhtn_django.utils.redis import redis_set
 from django.conf import settings
 
 html_head = """<!DOCTYPE html>
@@ -130,7 +130,7 @@ html_head = """<!DOCTYPE html>
                 <div id="content_top">
                     <strong>尊敬的用户：您好！</strong>
                     <strong>
-                        您正在进行<span>注册账号</span>操作，请在验证码中输入以下验证码完成操作：
+                        您正在进行<span>邮箱验证</span>操作，请在验证码中输入以下验证码完成操作：
                     </strong>
                     <div id="verificationCode">
                         <button class="button" >"""
@@ -161,12 +161,15 @@ html_end = """</button>
 
 
 def send_email(json_message):
-    message = json.loads(json_message)
-    email = message['email']
-    session_id = message['session_id']
+    session_email = json.loads(json_message)
+    email = session_email.get('email')
+    session_id = session_email.get('session_id')
     sms_code = '%06d' % random.randint(0, 999999)
 
-    redis_utils.redis_set(settings.REDIS_DB_VERIFY, session_id, sms_code, settings.REDIS_VERIFY_TIMEOUT)
+    redis_set(settings.REDIS_VERIFY, session_id, json.dumps({
+        "email": email,
+        "email_sms": sms_code
+    }), settings.REDIS_VERIFY_TIMEOUT)
 
     context = html_head + sms_code + html_end
     message = MIMEText(context, 'html', 'utf-8')

@@ -143,6 +143,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.common.BrokenLinkEmailsMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "dkhtn_django.MidWareLoginCheck.LoginCheck",
 ]
 
 # STATIC
@@ -324,12 +325,14 @@ chzN7EngUZj/ddKZs0Wmsm7O5KVePIRcHS3B3zfJT+g9v6OEDJafSn23JbK8yTGV
 ooCEG6gQIkg16Hz5HwIDAQAB
 -----END PUBLIC KEY-----'''
 
-# redis缓存默认失效时间
-REDIS_TIMEOUT = 60 * 60 * 24 * 7
+# redis缓存默认失效时间 1天
+REDIS_TIMEOUT = 60 * 60 * 24
+# 验证码失效时间 15分钟
 REDIS_VERIFY_TIMEOUT = 60 * 15
-# session id 字段命名
-REDIS_SESSION_NAME = "session_id"
 # 登录信息所在redis
-REDIS_DB_LOGIN = 'default'
+REDIS_LOGIN = 'default'
 # 邮箱验证所在redis
-REDIS_DB_VERIFY = '1'
+REDIS_VERIFY = '1'
+
+# 日志地址
+LOG_DIR = os.path.join(ROOT_DIR, 'logs')
