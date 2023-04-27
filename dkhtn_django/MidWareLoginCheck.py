@@ -11,7 +11,8 @@ from dkhtn_django.utils.log import Log
 class LoginCheck(MiddlewareMixin):
 
     def process_request(self, request):
-        pass_path = ["/api/user/login", "/api/user/register", "/api/user/email-send", "/api/user/rsa-pub", "/api/admin", "/api/user/password-change"]
+        pass_path = ["/api/user/login", "/api/user/register", "/api/user/email-send", "/api/user/rsa-pub", "/api/admin",
+                     "/api/user/password-change"]
         if request.path in pass_path:
             return None
         else:
@@ -27,7 +28,6 @@ class LoginCheck(MiddlewareMixin):
             else:
                 request.uid = json.loads(user_info).get("id")
                 return None
-
 
     def process_exception(self, request, exception):
         Log().error(exception.__str__())
