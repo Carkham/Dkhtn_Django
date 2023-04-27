@@ -35,5 +35,3 @@ def wrapper_verify_check(func):
         return func(request)
 
     return inner
-
-
