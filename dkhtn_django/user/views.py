@@ -242,6 +242,7 @@ def username_change(request):
         Log().error(e.__str__())
 
 
+@wrapper_verify_check
 def password_change(request):
     """
     修改用户密码，需检查登录状态以及同步数据库
@@ -249,11 +250,11 @@ def password_change(request):
     :return:
     """
     try:
-        uid = request.uid
         data = json.loads(request.body)
+        email = data.get("email")
         new_password = decrypt(data.get('password'))
 
-        users = User.objects.filter(id=uid)
+        users = User.objects.filter(email=email)
         if len(users) == 0:
             response = {
                 "code": 1,
