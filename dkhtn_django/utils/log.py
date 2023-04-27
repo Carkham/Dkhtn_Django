@@ -6,7 +6,7 @@ from django.conf import settings
 
 class Log(object):
     """
-    日志记录
+    日志记录.
     """
     def __init__(self):
         if not os.path.exists(settings.LOG_DIR):

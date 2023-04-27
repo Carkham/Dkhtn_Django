@@ -2,7 +2,7 @@ name: Flake8 & Docformat
 
 on:
   pull_request:
-    branches: [ "master", "main", "dev" ]
+    branches: [ "master", "main", "release", "dev" ]
     paths-ignore: [ "docs/**" ]
 
 jobs:
