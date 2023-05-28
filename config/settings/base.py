@@ -82,7 +82,8 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     # Your stuff: custom apps go here
     "dkhtn_django.user",
-    "dkhtn_django.log"
+    "dkhtn_django.log",
+    "dkhtn_django.monitor"
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -133,7 +134,7 @@ AUTH_PASSWORD_VALIDATORS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
+    # "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -325,10 +326,10 @@ ooCEG6gQIkg16Hz5HwIDAQAB
 
 # redis缓存默认失效时间
 REDIS_TIMEOUT = 60 * 60 * 24 * 7
+REDIS_VERIFY_TIMEOUT = 60 * 15
 # session id 字段命名
 REDIS_SESSION_NAME = "session_id"
 # 登录信息所在redis
 REDIS_DB_LOGIN = 'default'
 # 邮箱验证所在redis
 REDIS_DB_VERIFY = '1'
-
