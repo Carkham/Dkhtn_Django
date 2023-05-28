@@ -11,6 +11,7 @@ class User(AbstractUser):
     password = models.CharField(max_length=256, verbose_name='密码')
     email = models.CharField(max_length=32, unique=True, verbose_name='邮箱')
     avatar = models.CharField(max_length=4, verbose_name='头像')
+    is_staff = models.IntegerField()
 
     def get_info(self):
         """
@@ -22,4 +23,5 @@ class User(AbstractUser):
             'username': self.username,
             'avatar': self.avatar,
             'email': self.email,
+            'is_staff': self.is_staff,
         }
